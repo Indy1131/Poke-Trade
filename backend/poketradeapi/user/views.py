@@ -17,4 +17,23 @@ def get_user(request, user_id):
         return Response({'detail':'user not found'}, status = status.HTTP_404_NOT_FOUND)
 
 
+@api_view(['PUT'])
+def create_user(request):
+    try:
+        serializer = UserSerializer(data=request.data)
+        if serializer.is_valid():
+            user = serializer.save()  # Only save non-sensitive fields
+
+            # Set password manually
+            password = request.data.get('password')
+            if password:
+                user.set_password(password)
+                user.save()
+
+            return Response({'detail': 'User created successfully'}, status=status.HTTP_201_CREATED)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    except Exception as e:
+        return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
