@@ -9,8 +9,9 @@ export default function Login() {
   useEffect(() => {
     async function getData() {
       console.log(`${BASE_URL}pokemon`);
-      const response = await fetch(`${BASE_URL}/api/user/2`);
-      console.log(response);
+      const response = await fetch(`${BASE_URL}/api/user/2/`);
+      const json = await response.json();
+      console.log(json);
     }
 
     getData();
