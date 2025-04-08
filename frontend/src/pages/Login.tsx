@@ -1,13 +1,21 @@
+import { useEffect } from "react";
 import Button from "../components/form/Button";
 import Form from "../components/form/Form";
 import Input from "../components/form/Input";
 
-const schema = {
-  username: "",
-  password: "",
-};
+const BASE_URL = import.meta.env.VITE_BASE_URL;
 
 export default function Login() {
+  useEffect(() => {
+    async function getData() {
+      console.log(`${BASE_URL}pokemon`);
+      const response = await fetch(`${BASE_URL}/api/user/2`);
+      console.log(response);
+    }
+
+    getData();
+  }, []);
+
   return (
     <div className=" w-full flex justify-center">
       <div className="w-[min(700px,calc(100%-20px))] my-10">

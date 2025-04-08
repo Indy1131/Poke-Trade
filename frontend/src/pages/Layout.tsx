@@ -5,7 +5,7 @@ import Footer from "../components/Footer";
 
 export default function Layout({ children }: { children?: ReactElement }) {
   return (
-    <div className="w-full min-h-screen flex flex-col">
+    <div className="w-full min-h-screen flex flex-col font-family-main">
       <Nav />
       {children ? children : <Outlet />}
       <Footer />
