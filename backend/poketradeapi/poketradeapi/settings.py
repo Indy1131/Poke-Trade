@@ -44,7 +44,8 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt',
     'rest_framework_simplejwt.token_blacklist',
     'rest_framework',
-    'django_rest_passwordreset'
+    'django_rest_passwordreset',
+    'corsheaders'
 ]
 
 REST_FRAMEWORK = {
@@ -61,6 +62,11 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
+
+]
+CORS_ALLOWED_ORIGINS = [
+    'http://localhost:5173',
 ]
 
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
