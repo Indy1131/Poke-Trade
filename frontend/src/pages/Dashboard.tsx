@@ -1,10 +1,14 @@
 import { useAuth } from "../hooks/useAuth";
 
 export default function Dashboard() {
-  const { logout } = useAuth();
+  const { isAuthenticated, logout } = useAuth();
 
   function handleClick() {
     logout();
+  }
+
+  if (!isAuthenticated) {
+    return null;
   }
 
   return (
