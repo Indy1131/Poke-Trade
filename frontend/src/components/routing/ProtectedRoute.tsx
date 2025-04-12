@@ -8,6 +8,7 @@ export default function ProtectedRoute({ children }: { children?: ReactNode }) {
 
   useEffect(() => {
     if (!isAuthenticated) {
+      console.log("bro");
       navigate("/login", { replace: true });
     }
   }, [isAuthenticated, navigate]);

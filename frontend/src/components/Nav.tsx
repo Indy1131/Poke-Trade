@@ -26,7 +26,8 @@ export default function Nav() {
           {path.startsWith("/dashboard") ? (
             <>
               <Link to="/dashboard">Poke Trade</Link>
-              <Link to="/dashboard/market" className="ml-auto">
+              <h1 className="ml-auto text-green-400">$10000</h1>
+              <Link to="/dashboard/market">
                 Market
               </Link>
               <Link to="/dashboard/transactions">Transactions</Link>
