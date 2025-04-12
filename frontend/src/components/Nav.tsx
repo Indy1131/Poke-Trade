@@ -1,4 +1,18 @@
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useAuth } from "../hooks/useAuth";
+
 export default function Nav() {
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
+
+  const location = useLocation();
+  const path = location.pathname;
+
+  function handleClick() {
+    logout();
+    navigate("/login", { replace: true });
+  }
+
   return (
     <nav className="w-[100vw] sticky top-0 z-10">
       <div className="w-full h-[4rem] z-20 font-medium">
@@ -8,9 +22,29 @@ export default function Nav() {
             style={{ boxShadow: "0px 4px 20px -10px black" }}
           />
         </div> */}
-        <div className="w-full h-full flex items-center justify-between px-3 bg-white">
-          <h1>Poke Trade</h1>
-          <h1>Login</h1>
+        <div className="w-full h-full flex items-center px-3 gap-8 bg-white">
+          {path.startsWith("/dashboard") ? (
+            <>
+              <Link to="/dashboard">Poke Trade</Link>
+              <Link to="/dashboard/market" className="ml-auto">
+                Market
+              </Link>
+              <Link to="/dashboard/transactions">Transactions</Link>
+              {user && (
+                <h1 className="w-[200px] bg-amber-300 text-center">
+                  {user.username}
+                </h1>
+              )}
+              <button onClick={handleClick}>Logout</button>
+            </>
+          ) : (
+            <>
+              <Link to="/">Poke Trade</Link>
+              <Link to="/login" className="ml-auto">
+                Login
+              </Link>
+            </>
+          )}
         </div>
       </div>
     </nav>

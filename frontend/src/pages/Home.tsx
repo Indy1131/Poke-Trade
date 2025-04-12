@@ -104,7 +104,7 @@ export default function Home() {
         </div>
         <div className="absolute bg-gradient-to-t from-white to-transparent w-full h-[100px] bottom-0 z-0" />
       </div>
-      <div className="relative flex flex-col mt-30">
+      {/* <div className="relative flex flex-col mt-30">
         <div className="flex flex-col items-center mb-10">
           <div className="top-[100px] pt-[200px] mt-20 flex overflow-hidden">
             <img
@@ -124,7 +124,7 @@ export default function Home() {
             </div>
           </div>
         </div>
-      </div>
+      </div> */}
     </div>
   );
 }

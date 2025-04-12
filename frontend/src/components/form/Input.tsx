@@ -6,7 +6,8 @@ type Props = {
   noLabel?: boolean;
   value: string;
   onChange: React.ChangeEventHandler<HTMLInputElement>;
-  error?: string[] | null;
+  onFocus?: React.FocusEventHandler<HTMLInputElement>;
+  error?: string[] | null | undefined | string;
 };
 
 export default function Input({
@@ -17,6 +18,7 @@ export default function Input({
   noLabel,
   value,
   onChange,
+  onFocus,
   error,
 }: Props) {
   return (
@@ -35,6 +37,7 @@ export default function Input({
         id={name}
         value={value}
         onChange={onChange}
+        onFocus={onFocus}
       />
       <h1 className="text-secondary h-[1rem] mb-2">{error ? error[0] : ""}</h1>
     </div>

@@ -2,25 +2,33 @@ import { useState } from "react";
 import Button from "../components/form/Button";
 import Input from "../components/form/Input";
 import { Link, useNavigate } from "react-router-dom";
-import { useAuth } from "../hooks/useAuth";
 
 const BASE_URL = import.meta.env.VITE_BASE_URL;
 
 type Data = { [key: string]: string[] | string | null };
 
-export default function Login() {
-  const { login } = useAuth();
+export default function Signup() {
   const navigate = useNavigate();
 
-  const [formData, setFormData] = useState({ username: "", password: "" });
+  const [formData, setFormData] = useState({
+    username: "",
+    email: "",
+    password: "",
+    confirm: "",
+  });
   const [errors, setErrors] = useState<Data>({});
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
 
+    if (formData.password == " " || formData.password != formData.confirm) {
+      setErrors({ password: ["Passwords must match"] });
+      return;
+    }
+
     try {
-      const response = await fetch(`${BASE_URL}/api/user/login/`, {
-        method: "POST",
+      const response = await fetch(`${BASE_URL}/api/user/create/`, {
+        method: "PUT",
         headers: {
           "Content-Type": "application/json",
         },
@@ -28,7 +36,7 @@ export default function Login() {
       });
       const json = (await response.json()) as Data;
 
-      if (!json.refresh || !json.access) {
+      if (response.status != 201) {
         const newErrors = {} as Data;
         for (const key of Object.keys(json)) {
           newErrors[key] = json[key];
@@ -38,9 +46,8 @@ export default function Login() {
         return;
       }
 
-      login(json as { access: string; refresh: string });
-      console.log("redirecting");
-      navigate("/dashboard", { replace: true });
+      console.log("navigating");
+      navigate("/login");
     } catch {
       setErrors({
         detail: "There was an error requesting the server. Try again later.",
@@ -60,7 +67,7 @@ export default function Login() {
   return (
     <div className=" w-full flex justify-center">
       <div className="w-[min(700px,calc(100%-20px))] my-10">
-        <h1 className="text-3xl mb-4">Log in</h1>
+        <h1 className="text-3xl mb-4">Sign up</h1>
         <form
           className="border-2 border-outline flex flex-col gap-2 box-border p-4 rounded-md"
           onSubmit={handleSubmit}
@@ -73,7 +80,16 @@ export default function Login() {
             onChange={handleChange}
             onFocus={handleFocus}
             error={errors.username}
-            // noLabel
+          />
+          <Input
+            type="email"
+            name="email"
+            label="Email"
+            className="max-w-[500px]"
+            value={formData.email}
+            onChange={handleChange}
+            onFocus={handleFocus}
+            error={errors.email}
           />
           <Input
             type="password"
@@ -84,10 +100,19 @@ export default function Login() {
             onChange={handleChange}
             onFocus={handleFocus}
             error={errors.password}
-            // noLabel
           />
-          <Button className="max-w-[400px]" text="Log in" />
-          <Link to="/signup">Not registered? Sign up</Link>
+          <Input
+            type="password"
+            name="confirm"
+            label="Confirm Password"
+            className="max-w-[500px]"
+            value={formData.confirm}
+            onChange={handleChange}
+            onFocus={handleFocus}
+            error={errors.confirm}
+          />
+          <Button className="max-w-[400px]" text="Sign up" />
+          <Link to="/login">Already registered? Log in</Link>
           <h1 className="text-secondary h-[1rem]">
             {errors.detail ? errors.detail : ""}
           </h1>
