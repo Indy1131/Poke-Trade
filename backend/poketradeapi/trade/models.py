@@ -1,40 +1,46 @@
 from django.db import models
-from django.conf import settings
 from django.contrib.auth.models import User
 from pokemon.models import Pokemon
 
 
-# Create your models here.
-
-class TradeRequest(models.Model):
-    STATUS_CHOICES = [
-        ('Pending', 'Pending'),
-        ('Accepted', 'Accepted'),
-        ('Rejected', 'Rejected'),
+class Trade(models.Model):
+    TRADE_STATUS = [
+        ('pending', 'Pending'),
+        ('approved', 'Approved'),
+        ('rejected', 'Rejected'),
+        ('completed', 'Completed'),
     ]
 
-    sender = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="sent_trade_requests")
-    receiver = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="received_trade_requests")
-    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='Pending')
-    timestamp = models.DateTimeField(auto_now_add=True)
+    TRADE_TYPE = [
+        ('purchase', 'Purchase'),
+        ('trade', 'Trade'),
+    ]
 
-    def __str__(self):
-        return f"Trade from {self.sender} to {self.receiver} - {self.status}"
+    id = models.AutoField(primary_key=True)
+    requester = models.ForeignKey(User, on_delete=models.CASCADE,
+                                  related_name='trade_requests'
+                                  )  # who is initiating the request
+    recipient = models.ForeignKey(User, on_delete=models.CASCADE,
+                                  related_name='received_trades')  # who owns the Pokemon
 
+    pokemon_offered = models.ForeignKey(
+        Pokemon,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='offered_in_trades'
+    )  # for trade
 
-class TradeDetail(models.Model):
-    trade_request = models.ForeignKey(TradeRequest, on_delete=models.CASCADE, related_name="trade_details")
-    offered_pokemon = models.ForeignKey(Pokemon, on_delete=models.CASCADE, related_name="offered_in_trades")
-    requested_pokemon = models.ForeignKey(Pokemon, on_delete=models.CASCADE, related_name="requested_in_trades")
+    pokemon_requested = models.ForeignKey(
+        Pokemon,
+        on_delete=models.CASCADE,
+        related_name='requested_in_trades',
+        null=False,
 
-    def __str__(self):
-        return f"{self.offered_pokemon} ⇆ {self.requested_pokemon}"
+    )  # target Pokemon
 
+    trade_type = models.CharField(max_length=10, choices=TRADE_TYPE)
+    status = models.CharField(max_length=10, choices=TRADE_STATUS, default='pending')
 
-class Trade(models.Model):
-    initiator = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="initiated_trades")
-    recipient = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="completed_trades")
-    timestamp = models.DateTimeField(auto_now_add=True)
-
-    def __str__(self):
-        return f"Trade between {self.initiator} and {self.recipient} on {self.timestamp}"
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)

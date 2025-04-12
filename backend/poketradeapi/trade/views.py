@@ -1,38 +1,79 @@
-from django.shortcuts import render, get_object_or_404, redirect
-from django.contrib.auth.decorators import login_required
-from .models import TradeRequest, Trade, TradeDetail
-from pokemon.models import Pokemon  # Import the Pokémon model
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from rest_framework import status
+from .models import Trade
+from .serializers import TradeSerializer
+from pokemon.models import Pokemon
 
-@login_required
-def send_trade_request(request, receiver_id, offered_pokemon_id, requested_pokemon_id):
-    receiver = get_object_or_404(settings.AUTH_USER_MODEL, id=receiver_id)
-    offered_pokemon = get_object_or_404(Pokemon, id=offered_pokemon_id, owner=request.user)
-    requested_pokemon = get_object_or_404(Pokemon, id=requested_pokemon_id, owner=receiver)
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def create_trade_request(request):
+    data = request.data.copy()
+    data['requester'] = request.user.id  # auto-assign requester
 
-    trade_request = TradeRequest.objects.create(sender=request.user, receiver=receiver)
-    TradeDetail.objects.create(trade_request=trade_request, offered_pokemon=offered_pokemon, requested_pokemon=requested_pokemon)
+    serializer = TradeSerializer(data=data)
+    if serializer.is_valid():
+        serializer.save()
+        return Response({'detail': 'Trade request submitted'}, status=status.HTTP_201_CREATED)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    return redirect('trade_list')
 
-@login_required
-def accept_trade(request, trade_request_id):
-    trade_request = get_object_or_404(TradeRequest, id=trade_request_id, receiver=request.user)
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_user_trades(request):
+    trades = Trade.objects.filter(requester=request.user)
+    serializer = TradeSerializer(trades, many=True)
+    return Response(serializer.data, status=status.HTTP_200_OK)
 
-    if trade_request.status != "Pending":
-        return redirect('trade_list')
 
-    trade_request.status = "Accepted"
-    trade_request.save()
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_incoming_requests(request):
+    trades = Trade.objects.filter(recipient=request.user, status='pending')
+    serializer = TradeSerializer(trades, many=True)
+    return Response(serializer.data, status=status.HTTP_200_OK)
 
-    trade = Trade.objects.create(initiator=trade_request.sender, recipient=trade_request.receiver)
 
-    for trade_detail in trade_request.trade_details.all():
-        offered_pokemon = trade_detail.offered_pokemon
-        requested_pokemon = trade_detail.requested_pokemon
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def update_trade_status(request, trade_id):
+    try:
+        trade = Trade.objects.get(id=trade_id, recipient=request.user)
+    except Trade.DoesNotExist:
+        return Response({'detail': 'Trade not found or unauthorized'}, status=status.HTTP_404_NOT_FOUND)
 
-        # Swap Pokémon ownership
-        offered_pokemon.owner, requested_pokemon.owner = requested_pokemon.owner, offered_pokemon.owner
-        offered_pokemon.save()
-        requested_pokemon.save()
+    status_choice = request.data.get('status')
+    if status_choice not in ['approved', 'rejected']:
+        return Response({'detail': 'Invalid status'}, status=status.HTTP_400_BAD_REQUEST)
 
-    return redirect('trade_list')
+    if trade.status != 'pending':
+        return Response({'detail': 'Trade already resolved'}, status=status.HTTP_400_BAD_REQUEST)
+
+    # Update status
+    trade.status = status_choice
+    trade.save()
+
+    # Transfer logic for approval
+    if status_choice == 'approved':
+        if trade.trade_type == 'purchase':
+            # Transfer ownership of the requested Pokemon to the requester
+            trade.pokemon_requested.owner_user = trade.requester
+            trade.pokemon_requested.save()
+        elif trade.trade_type == 'trade':
+            # Swap ownership of both Pokémon
+            offered = trade.pokemon_offered
+            requested = trade.pokemon_requested
+
+            # Swap owners
+            offered_owner = offered.owner_user
+            offered.owner_user = requested.owner_user
+            requested.owner_user = offered_owner
+
+            offered.save()
+            requested.save()
+
+        trade.status = 'completed'
+        trade.save()
+
+    return Response({'detail': f'Trade {status_choice} successfully.'}, status=status.HTTP_200_OK)
