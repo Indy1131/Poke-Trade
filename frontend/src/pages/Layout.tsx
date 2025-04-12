@@ -5,10 +5,14 @@ import Footer from "../components/Footer";
 
 export default function Layout({ children }: { children?: ReactElement }) {
   return (
-    <div className="w-full min-h-screen flex flex-col font-family-main">
+    <div className="w-full h-screen flex flex-col font-family-main">
       <Nav />
-      {children ? children : <Outlet />}
-      <Footer />
+      <div className="overflow-hidden flex flex-1 flex-col">
+        <div className="overflow-scroll flex-1 flex flex-col">
+          {children ? children : <Outlet />}
+          <Footer />
+        </div>
+      </div>
     </div>
   );
 }

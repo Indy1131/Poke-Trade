@@ -4,7 +4,7 @@ import InfiniteCarousel from "../components/InfiniteCarousel";
 
 export default function Home() {
   return (
-    <div className="h-full flex-1 flex flex-col items-center relative">
+    <div className="flex-1 flex flex-col items-center relative">
       <h1 className="mt-40 mb-5 text-7xl font-medium bg-gradient-to-l from-primary to-secondary bg-clip-text text-transparent">
         Gotta catch 'em all.
       </h1>

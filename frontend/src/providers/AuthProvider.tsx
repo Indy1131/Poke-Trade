@@ -2,9 +2,15 @@ import { createContext, ReactNode, useEffect, useState } from "react";
 
 const BASE_URL = import.meta.env.VITE_BASE_URL;
 
+type User = {
+  username: string;
+  email: string;
+};
+
+// eslint-disable-next-line react-refresh/only-export-components
 export const AuthContext = createContext<{
   isAuthenticated: boolean;
-  user: object | null;
+  user: User | null;
   login: (response: { access: string; refresh: string }) => void;
   logout: () => void;
   refreshUser: () => void;
@@ -37,7 +43,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   function logout() {
-    setToken(null);
+    setToken(undefined);
     setUser(null);
     document.cookie = "access=; path=/; max-age=-1";
     document.cookie = "refresh=; path=/; max-age=-1";

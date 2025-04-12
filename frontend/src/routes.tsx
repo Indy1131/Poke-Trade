@@ -8,6 +8,7 @@ import ProtectedRoute from "./components/routing/ProtectedRoute";
 import Signup from "./pages/Signup";
 import Market from "./pages/dashboard/Market";
 import Transactions from "./pages/dashboard/Transactions";
+import Pokemon from "./pages/dashboard/Pokemon";
 
 export default [
   {
@@ -58,6 +59,10 @@ export default [
           {
             path: "/dashboard/transactions",
             element: <Transactions />,
+          },
+          {
+            path: "/dashboard/pokemon/:id",
+            element: <Pokemon />,
           },
         ],
       },
