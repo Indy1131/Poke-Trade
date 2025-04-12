@@ -45,7 +45,8 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt.token_blacklist',
     'rest_framework',
     'django_rest_passwordreset',
-    'corsheaders'
+    'corsheaders',
+    'trade',
 ]
 
 REST_FRAMEWORK = {
@@ -150,4 +151,3 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
