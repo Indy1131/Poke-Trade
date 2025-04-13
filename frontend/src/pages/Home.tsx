@@ -39,11 +39,13 @@ export default function Home() {
           </div>
         </div>
         <div className="w-[min(1000px,calc(100%-60px))]">
-          {/* <div>BUFFER</div> */}
           <div className="grid grid-cols-2 gap-10 mt-20 px-10">
             <Card className="flex-1">
               <h1 className="text-black text-4xl py-5 h-30">
-                <span className="text-tertiary">Collect</span> your Pokemon.
+                <span className="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+                  Collect
+                </span>{" "}
+                your Pokemon.
               </h1>
               <p>
                 We have over 1000 of your favorite Pokemon. Build your
@@ -52,7 +54,10 @@ export default function Home() {
             </Card>
             <Card className="flex-1">
               <h1 className="text-black text-4xl py-5 h-30">
-                <span className="text-tertiary">Trade</span> your Pokemon.
+                <span className="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+                  Trade
+                </span>{" "}
+                your Pokemon.
               </h1>
               <p>
                 We have over 1000 of your favorite Pokemon. Build your
@@ -61,7 +66,10 @@ export default function Home() {
             </Card>
             <Card className="flex-1">
               <h1 className="text-black text-4xl py-5 h-30">
-                <span className="text-tertiary">Sell</span> your Pokemon.
+                <span className="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+                  Sell
+                </span>{" "}
+                your Pokemon.
               </h1>
               <p>
                 We have over 1000 of your favorite Pokemon. Build your
@@ -70,7 +78,10 @@ export default function Home() {
             </Card>
             <Card className="flex-1">
               <h1 className="text-black text-4xl py-5 h-30">
-                <span className="text-tertiary">Socialize</span> with fans.
+                <span className="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+                  Socialize
+                </span>{" "}
+                with fans.
               </h1>
               <p>
                 We have over 1000 of your favorite Pokemon. Build your
@@ -84,7 +95,7 @@ export default function Home() {
         Everything for you.
       </h1>
       <h2 className="text-3xl">Tons of features.</h2>
-      <div className="flex flex-col items-center w-full bg-gradient-to-b from-primary to-secondary relative">
+      <div className="flex flex-col items-center w-full bg-gradient-to-b from-primary to-secondary relative mb-10">
         <div className="absolute bg-gradient-to-b from-white to-transparent w-full h-[600px] top-0 z-0" />
         <div className="z-1 flex flex-col items-center bg-white rounded-t-xl mt-10 pb-20 w-[calc(100%-60px)]">
           <img src="/pokeball.png" className="w-[900px] mt-5" />

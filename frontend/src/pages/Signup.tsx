@@ -65,13 +65,20 @@ export default function Signup() {
   }
 
   return (
-    <div className=" w-full flex justify-center">
-      <div className="w-[min(700px,calc(100%-20px))] my-10">
-        <h1 className="text-3xl mb-4">Sign up</h1>
+    <div className=" w-full flex justify-center bg-gradient-to-t from-primary to-secondary h-full relative">
+      <div className="absolute bg-gradient-to-b from-white to-transparent w-full h-[200px] top-0 z-0" />
+      <div className="absolute bg-gradient-to-t from-white to-transparent w-full h-[200px] bottom-0 z-0" />
+      <div className="w-[calc(100%-60px)] mt-10 bg-white rounded-t-3xl z-2 p-10 flex justify-center">
         <form
-          className="border-2 border-outline flex flex-col gap-2 box-border p-4 rounded-md"
+          className="bg-white border-0 border-outline flex flex-col gap-2 box-border p-4 rounded-md w-[500px]"
           onSubmit={handleSubmit}
         >
+          <div>
+            <h1 className="text-4xl font-medium py-2 mb-4 bg-gradient-to-l from-primary to-secondary bg-clip-text text-transparent inline-block">
+              Sign up
+            </h1>
+          </div>
+
           <Input
             name="username"
             label="Username"
@@ -80,6 +87,7 @@ export default function Signup() {
             onChange={handleChange}
             onFocus={handleFocus}
             error={errors.username}
+            noLabel
           />
           <Input
             type="email"
@@ -90,6 +98,7 @@ export default function Signup() {
             onChange={handleChange}
             onFocus={handleFocus}
             error={errors.email}
+            noLabel
           />
           <Input
             type="password"
@@ -100,6 +109,7 @@ export default function Signup() {
             onChange={handleChange}
             onFocus={handleFocus}
             error={errors.password}
+            noLabel
           />
           <Input
             type="password"
@@ -110,9 +120,15 @@ export default function Signup() {
             onChange={handleChange}
             onFocus={handleFocus}
             error={errors.confirm}
+            noLabel
           />
           <Button className="max-w-[400px]" text="Sign up" />
-          <Link to="/login">Already registered? Log in</Link>
+          <Link to="/login" className="text-sm">
+            Already registered?{" "}
+            <span className="bg-gradient-to-l from-primary to-secondary bg-clip-text text-transparent">
+              Log in
+            </span>
+          </Link>
           <h1 className="text-secondary h-[1rem]">
             {errors.detail ? errors.detail : ""}
           </h1>

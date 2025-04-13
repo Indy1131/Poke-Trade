@@ -16,7 +16,7 @@ export default function InfiniteCarousel({ children, className }: props) {
 
       .infinite-scroll {
         transform: translateX(0);
-        animation: scroll 35s linear infinite;
+        animation: scroll 50s linear infinite;
         width: max-content;
       }
     `;

@@ -30,7 +30,8 @@ export default function Input({
       )}
       <input
         type={type ? type : "text"}
-        className="border-2 border-outline box-border rounded-md w-full p-2"
+        className="border-2 border-outline box-border rounded-md w-full p-2 border-[#9D033A]"
+        // style={{ boxShadow: "0 0px 3px 0px #9D033A" }}
         autoComplete="off"
         placeholder={label}
         name={name}
@@ -39,7 +40,7 @@ export default function Input({
         onChange={onChange}
         onFocus={onFocus}
       />
-      <h1 className="text-secondary h-[1rem] mb-2">{error ? error[0] : ""}</h1>
+      <h1 className="text-primary h-[1rem] my-1">{error ? error[0] : ""}</h1>
     </div>
   );
 }

@@ -58,13 +58,19 @@ export default function Login() {
   }
 
   return (
-    <div className=" w-full flex justify-center">
-      <div className="w-[min(700px,calc(100%-20px))] my-10">
-        <h1 className="text-3xl mb-4">Log in</h1>
+    <div className=" w-full flex justify-center bg-gradient-to-t from-primary to-secondary h-full relative">
+      <div className="absolute bg-gradient-to-b from-white to-transparent w-full h-[200px] top-0 z-0" />
+      <div className="absolute bg-gradient-to-t from-white to-transparent w-full h-[200px] bottom-0 z-0" />
+      <div className="w-[calc(100%-60px)] mt-10 bg-white rounded-t-3xl z-2 p-10 flex justify-center">
         <form
-          className="border-2 border-outline flex flex-col gap-2 box-border p-4 rounded-md"
+          className="bg-white border-0 border-outline flex flex-col gap-2 box-border p-4 rounded-md w-[500px]"
           onSubmit={handleSubmit}
         >
+          <div>
+            <h1 className="text-4xl font-medium py-2 mb-4 bg-gradient-to-l from-primary to-secondary bg-clip-text text-transparent inline-block">
+              Log in
+            </h1>
+          </div>
           <Input
             name="username"
             label="Username"
@@ -73,7 +79,7 @@ export default function Login() {
             onChange={handleChange}
             onFocus={handleFocus}
             error={errors.username}
-            // noLabel
+            noLabel
           />
           <Input
             type="password"
@@ -84,11 +90,24 @@ export default function Login() {
             onChange={handleChange}
             onFocus={handleFocus}
             error={errors.password}
-            // noLabel
+            noLabel
           />
-          <Button className="max-w-[400px]" text="Log in" />
-          <Link to="/signup">Not registered? Sign up</Link>
-          <h1 className="text-secondary h-[1rem]">
+          <Button className="w-full self-center" text="Log in" />
+          <div className="flex justify-between text-sm">
+            <Link to="/signup">
+              Not registered?{" "}
+              <span className="bg-gradient-to-l from-primary to-secondary bg-clip-text text-transparent">
+                Sign up
+              </span>
+            </Link>
+            <h1>
+              Forgot your password?{" "}
+              <span className="bg-gradient-to-l from-primary to-secondary bg-clip-text text-transparent">
+                Click here
+              </span>
+            </h1>
+          </div>
+          <h1 className="text-primary h-[1rem] w-full text-center">
             {errors.detail ? errors.detail : ""}
           </h1>
         </form>

@@ -1,3 +1,13 @@
+import SearchBar from "../../components/SearchBar";
+
 export default function Market() {
-    return <h1>This is the market. we need seperate headers for each category such as prioritized, favorites etc?</h1>
+  return (
+    <div>
+      <SearchBar />
+      <h1>My listings</h1>
+      <p>mne</p>
+      <h1>Top listings</h1>
+      <p>mne</p>
+    </div>
+  );
 }

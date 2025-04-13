@@ -1,19 +1,28 @@
-import { Link, useLocation } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { Link, useParams } from "react-router-dom";
 
 export default function Pokemon() {
-  //   const location = useLocation();
-  //   const path = location.pathname;
+  const { id } = useParams();
+  const [data, setData] = useState(null);
 
-  //   console.log(path);
+  useEffect(() => {
+    setData({
+      id: 1,
+      name: "Pokemon Name",
+    });
+  }, [id]);
 
-  //   const previous = path.startsWith("/dashboard/pokemon")
-  //     ? "/dashboard"
-  //     : "/market";
+  if (!data) {
+    return <h1>Loading...</h1>;
+  }
 
   return (
     <>
       <Link to="/dashboard">Go back</Link>
       <h1>This is the specific page for this specific pokemon</h1>
+      <form>
+        <button>List/Unlist</button>
+      </form>
     </>
   );
 }

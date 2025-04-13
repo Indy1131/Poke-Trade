@@ -4,7 +4,6 @@ export default function Footer() {
       <h1 className="">Poke Trade</h1>
       <h1 className="ml-auto">Login</h1>
       <h1 className="">Sign up</h1>
-      <h1 className="">Dashboard</h1>
     </footer>
   );
 }

@@ -6,7 +6,7 @@ type props = {
 export default function Button({ className, text }: props) {
   return (
     <button
-      className={`bg-gradient-to-t from-primary to-secondary rounded-xl p-4 ${className}`}
+      className={`cursor-pointer bg-gradient-to-tr text-white from-primary to-secondary rounded-xl p-4 ${className}`}
     >
       {text}
     </button>
