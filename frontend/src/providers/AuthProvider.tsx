@@ -10,6 +10,7 @@ type User = {
 // eslint-disable-next-line react-refresh/only-export-components
 export const AuthContext = createContext<{
   isAuthenticated: boolean;
+  token: string | undefined;
   user: User | null;
   login: (response: { access: string; refresh: string }) => void;
   logout: () => void;
@@ -37,8 +38,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [token]);
 
   function login(response: { access: string; refresh: string }) {
-    document.cookie = `access=${response.access}; path=/; max-age=3600`;
-    document.cookie = `refresh=${response.refresh}; path=/; max-age=604800`;
+    document.cookie = `access=${response.access}; path=/; max-age=3600; SameSite=None; Secure`;
+    document.cookie = `refresh=${response.refresh}; path=/; max-age=3600; SameSite=None; Secure;`;
     setToken(response.access);
   }
 
@@ -63,7 +64,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   return (
     <AuthContext.Provider
-      value={{ user, isAuthenticated: !!token, login, logout, refreshUser }}
+      value={{
+        user,
+        isAuthenticated: !!token,
+        token,
+        login,
+        logout,
+        refreshUser,
+      }}
     >
       {children}
     </AuthContext.Provider>

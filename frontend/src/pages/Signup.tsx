@@ -42,6 +42,8 @@ export default function Signup() {
           newErrors[key] = json[key];
         }
 
+        console.log(newErrors);
+
         setErrors(newErrors);
         return;
       }

@@ -5,8 +5,10 @@ type Props = {
 };
 
 type Pokemon = {
-  name: string;
+  api_data: { sprite: string; name: string; types: string[] };
   id: number;
+  owner_user: number;
+  poke_dex_id: number;
 };
 
 export default function PokeCard({ pokemon }: Props) {
@@ -15,12 +17,17 @@ export default function PokeCard({ pokemon }: Props) {
       to={`/dashboard/pokemon/${pokemon.id}`}
       className="flex justify-center transition-all duration-75 ease-out items-center w-[210px] h-[210px] p-[5px] hover:p-0"
     >
-      <div className="border-2 border-outline rounded-md flex flex-col p-2 items-center relative w-full h-full">
+      <div className="border-2 border-outline rounded-md flex flex-col items-center relative h-full w-full overflow-hidden p-2 bg-gradient-to-tr from-outline via-white to-white">
+        <h1 className="absolute top-1 left-1 text-xl text-outline">
+          {pokemon.api_data.name[0].toUpperCase() +
+            pokemon.api_data.name.substring(1)}
+        </h1>
         <div className="flex-1 w-full relative">
-          <div className="absolute bottom-0 left-0 bg-gradient-to-t from-white to-transparent w-full">
-            <h1 className="text-md">{pokemon.name}</h1>
-          </div>
-          <img src="/groudon.png" className="w-full h-full object-cover" />
+          <img
+            src={pokemon.api_data.sprite}
+            className="object-cover w-full h-full bg-gradient-to-tr"
+            style={{ imageRendering: "pixelated" }}
+          />
         </div>
       </div>
     </Link>
