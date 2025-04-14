@@ -1,4 +1,4 @@
-altgraph @ file:///AppleInternal/Library/BuildRoots/626bfa9c-8221-11ef-b9bf-daac7d5d70b1/Library/Caches/com.apple.xbs/Sources/python3/altgraph-0.17.2-py2.py3-none-any.whl
+altgraph==0.17.2
 asgiref==3.8.1
 certifi==2025.1.31
 charset-normalizer==3.4.1
@@ -8,12 +8,12 @@ django-environ==0.12.0
 django-rest-passwordreset==1.5.0
 djangorestframework==3.15.2
 djangorestframework_simplejwt==5.5.0
-future @ file:///AppleInternal/Library/BuildRoots/626bfa9c-8221-11ef-b9bf-daac7d5d70b1/Library/Caches/com.apple.xbs/Sources/python3/future-0.18.2-py3-none-any.whl
+future==0.18.2
 idna==3.10
-macholib @ file:///AppleInternal/Library/BuildRoots/626bfa9c-8221-11ef-b9bf-daac7d5d70b1/Library/Caches/com.apple.xbs/Sources/python3/macholib-1.15.2-py2.py3-none-any.whl
+macholib==1.15.2
 PyJWT==2.9.0
 requests==2.32.3
-six @ file:///AppleInternal/Library/BuildRoots/626bfa9c-8221-11ef-b9bf-daac7d5d70b1/Library/Caches/com.apple.xbs/Sources/python3/six-1.15.0-py2.py3-none-any.whl
+six==1.15.0
 sqlparse==0.5.3
 typing_extensions==4.13.0
 urllib3==2.4.0
