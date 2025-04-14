@@ -18,7 +18,7 @@ export default function PokeCard({ pokemon }: Props) {
       className="flex justify-center transition-all duration-75 ease-out items-center w-[210px] h-[210px] p-[5px] hover:p-0"
     >
       <div className="border-2 border-outline rounded-md flex flex-col items-center relative h-full w-full overflow-hidden p-2 bg-gradient-to-tr from-outline via-white to-white">
-        <h1 className="absolute top-1 left-1 text-xl text-outline">
+        <h1 className="absolute top-1 left-1 text-xl text-outline z-2">
           {pokemon.api_data.name[0].toUpperCase() +
             pokemon.api_data.name.substring(1)}
         </h1>

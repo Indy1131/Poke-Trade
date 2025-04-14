@@ -20,8 +20,6 @@ export default function Dashboard() {
 
   const search = searchParams.get("keyword");
 
-  console.log(data);
-
   useEffect(() => {
     let url = `${BASE_URL}/api/pokemon/user_pokemon/`;
     if (search) url += `?keyword=${search}`;

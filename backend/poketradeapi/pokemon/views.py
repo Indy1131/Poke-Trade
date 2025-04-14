@@ -19,7 +19,7 @@ def get_pokemon(request, pokemon_id):
         return Response(data = data, status = status.HTTP_200_OK)
     except(Pokemon.DoesNotExist):
         return Response(data = {'detail':'pokemon not found'}, status = status.HTTP_404_NOT_FOUND)
-    
+
 @api_view(['PUT'])
 def create_pokemon(request):
     try:

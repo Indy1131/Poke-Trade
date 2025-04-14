@@ -28,24 +28,27 @@ def fetch_pokeapi_data(poke_dex_id):
         res = requests.get(f"https://pokeapi.co/api/v2/pokemon/{poke_dex_id}")
         if res.status_code == 200:
             data = res.json()
+
             name = data['name']
             types = [t['type']['name'] for t in data['types']]
             sprite = data['sprites']['front_default']
 
             # Save to cache
-            PokeAPICache.objects.create(
-                poke_dex_id=poke_dex_id,
-                name=name,
-                types=types,
-                sprite=sprite
-            )
+            if not PokeAPICache.objects.filter(poke_dex_id=poke_dex_id).exists():
+                PokeAPICache.objects.create(
+                    poke_dex_id=poke_dex_id,
+                    name=name,
+                    types=types,
+                    sprite=sprite
+                )
 
             return {
                 'name': name,
                 'types': types,
                 'sprite': sprite
             }
-    except:
+    except Exception as e:
+        print(e)
         pass
 
     return None
