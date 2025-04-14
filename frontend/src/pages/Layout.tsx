@@ -8,7 +8,7 @@ export default function Layout({ children }: { children?: ReactElement }) {
     <div className="w-full h-screen flex flex-col font-family-main">
       <Nav />
       <div className="overflow-hidden flex flex-1 flex-col">
-        <div className="overflow-scroll flex-1 flex flex-col">
+        <div className="overflow-scroll flex-1 flex flex-col relative">
           {children ? children : <Outlet />}
           <Footer />
         </div>

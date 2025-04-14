@@ -26,17 +26,22 @@ export default function Nav() {
           {path.startsWith("/dashboard") ? (
             <>
               <Link to="/dashboard">Poke Trade</Link>
-              <h1 className="ml-auto text-green-400">$10000</h1>
-              <Link to="/dashboard/market">
+              <Link to="/dashboard/market" className="ml-auto">
                 Market
               </Link>
               <Link to="/dashboard/transactions">Transactions</Link>
               {user && (
-                <h1 className="w-[200px] bg-amber-300 text-center">
-                  {user.username}
-                </h1>
+                <div className="flex items-center gap-2 w-[200px] py-2 px-2">
+                  <h1 className=" bg-secondary rounded-full text-center w-[2.5rem] h-[2.5rem] flex items-center justify-center text-xl text-white">
+                    {user.username[0].toUpperCase()}
+                  </h1>
+                  <div>
+                    <h1 className="text-xs">{user.username}</h1>
+                    <h1 className="ml-auto text-green-400 text-xs">$10000</h1>
+                  </div>
+                  <button onClick={handleClick} className="text-sm ml-auto cursor-pointer">Logout</button>
+                </div>
               )}
-              <button onClick={handleClick}>Logout</button>
             </>
           ) : (
             <>

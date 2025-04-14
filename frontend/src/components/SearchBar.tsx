@@ -31,7 +31,7 @@ export default function SearchBar({ className }: Props) {
       onSubmit={handleSubmit}
     >
       <input
-        className="bg-white border-3 border-primary rounded-full px-3 py-2 box-border w-[calc(100%-60px)]"
+        className="bg-white border-2 border-outline rounded-md px-3 py-2 box-border w-[calc(100%-60px)]"
         placeholder="Search"
         value={search}
         onChange={handleChange}

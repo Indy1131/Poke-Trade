@@ -30,7 +30,7 @@ export default function Input({
       )}
       <input
         type={type ? type : "text"}
-        className="border-2 border-outline box-border rounded-md w-full p-2 border-[#9D033A]"
+        className="border-2 border-outline box-border rounded-md w-full p-2 border-outline"
         // style={{ boxShadow: "0 0px 3px 0px #9D033A" }}
         autoComplete="off"
         placeholder={label}
