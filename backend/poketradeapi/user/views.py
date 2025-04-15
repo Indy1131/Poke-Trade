@@ -3,8 +3,9 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
 from .serializers import UserSerializer
+from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework_simplejwt.tokens import RefreshToken
-
+from pokemon.utils import assign_random_pokemon_to_user
 # Create your views here.
 
 @api_view(['GET'])
@@ -29,6 +30,8 @@ def create_user(request):
             if password:
                 user.set_password(password)
                 user.save()
+            
+            assign_random_pokemon_to_user(user)
 
             return Response({'detail': 'User created successfully'}, status=status.HTTP_201_CREATED)
 
@@ -46,3 +49,38 @@ def logout_user(request):
         return Response({"detail": "Logout successful."}, status=status.HTTP_205_RESET_CONTENT)
     except Exception as e:
         return Response({"detail": "Invalid token."}, status=status.HTTP_400_BAD_REQUEST)
+    
+class CookieTokenObtainPairView(TokenObtainPairView):
+    def post(self, request, *args, **kwargs):
+        response = super().post(request, *args, **kwargs)
+
+        # Grab tokens from response data
+        access_token = response.data.get("access")
+        refresh_token = response.data.get("refresh")
+
+        # Remove tokens from body if you want to be strict about cookie-only
+        # del response.data["access"]
+        # del response.data["refresh"]
+
+        if access_token and refresh_token:
+            # Set cookies
+            response.set_cookie(
+                key='access',
+                value=access_token,
+                httponly=True,
+                secure=False,           # True in production (requires HTTPS)
+                samesite='Lax',       # Needed for cross-site cookies
+                max_age=3600,
+                path='/'
+            )
+            response.set_cookie(
+                key='refresh',
+                value=refresh_token,
+                httponly=True,
+                secure=False,
+                samesite='Lax',
+                max_age=7 * 24 * 60 * 60,
+                path='/'
+            )
+
+        return response
