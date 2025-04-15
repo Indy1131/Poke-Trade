@@ -81,3 +81,32 @@ class PokemonViewTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertIn('api_data', response.data)
         self.assertIn('sprite', response.data['api_data'])
+
+class AdminPokemonManagementTests(APITestCase):
+    def setUp(self):
+        self.admin_user = User.objects.create_superuser(username="admin", email="admin@test.com", password="adminpass")
+        self.user = User.objects.create_user(username="ash", email="ash@poke.com", password="pikachu123")
+
+        self.client = APIClient()
+        self.client.force_authenticate(user=self.admin_user)
+
+        self.pokemon = Pokemon.objects.create(poke_dex_id=4, owner_user=self.user)  # Charmander
+
+    def test_admin_can_view_pokemon(self):
+        url = reverse("get_pokemon", kwargs={"pokemon_id": self.pokemon.id})
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["poke_dex_id"], 4)
+
+    def test_admin_can_update_pokemon(self):
+        url = reverse("update_pokemon", kwargs={"pokemon_id": self.pokemon.id})
+        data = {"poke_dex_id": 5}  # Charmeleon
+        response = self.client.patch(url, data)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["poke_dex_id"], 5)
+
+    def test_admin_can_delete_pokemon(self):
+        url = reverse("delete_pokemon", kwargs={"pokemon_id": self.pokemon.id})
+        response = self.client.delete(url)
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertFalse(Pokemon.objects.filter(id=self.pokemon.id).exists())

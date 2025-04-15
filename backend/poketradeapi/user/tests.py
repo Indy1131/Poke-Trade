@@ -1,5 +1,5 @@
 from django.urls import reverse
-from rest_framework.test import APITestCase
+from rest_framework.test import APITestCase, APIClient
 from rest_framework import status
 from django.contrib.auth.models import User
 from pokemon.models import Pokemon
@@ -87,3 +87,29 @@ class AuthTests(APITestCase):
         pokemons = user.owned_pokemon.all()
         self.assertEqual(pokemons.count(), 3)
 
+class AdminUserManagementTests(APITestCase):
+    def setUp(self):
+        self.admin_user = User.objects.create_superuser(username="admin", email="admin@test.com", password="adminpass")
+        self.regular_user = User.objects.create_user(username="ash", email="ash@poke.com", password="pikachu123")
+
+        self.client = APIClient()
+        self.client.force_authenticate(user=self.admin_user)
+
+    def test_admin_can_view_user_detail(self):
+        url = reverse("get_user", kwargs={"user_id": self.regular_user.id})
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["username"], "ash")
+
+    def test_admin_can_update_user(self):
+        url = reverse("update_user", kwargs={"user_id": self.regular_user.id})
+        data = {"email": "updated@poke.com"}
+        response = self.client.patch(url, data)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["email"], "updated@poke.com")
+
+    def test_admin_can_delete_user(self):
+        url = reverse("delete_user", kwargs={"user_id": self.regular_user.id})
+        response = self.client.delete(url)
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertFalse(User.objects.filter(id=self.regular_user.id).exists())

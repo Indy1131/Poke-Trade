@@ -1,11 +1,16 @@
 from django.contrib.auth.models import User
+from django.shortcuts import get_object_or_404
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
+from poketradeapi.utils import admin_required
 from .serializers import UserSerializer
 from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework_simplejwt.tokens import RefreshToken
 from pokemon.utils import assign_random_pokemon_to_user
+from pokemon.serializers import PokemonSerializer
+from market.models import Bids, Asks
+from market.serializers import BidsSerializer, AsksSerializer
 # Create your views here.
 
 @api_view(['GET'])
@@ -84,3 +89,53 @@ class CookieTokenObtainPairView(TokenObtainPairView):
             )
 
         return response
+
+@api_view(['GET'])
+@admin_required
+def get_all_users(request):
+    users = User.objects.all()
+    serializer = UserSerializer(users, many=True)
+    return Response(serializer.data)
+
+@api_view(['PUT'])
+@admin_required
+def update_user(request, user_id):
+    user = get_object_or_404(User, id=user_id)
+    serializer = UserSerializer(user, data=request.data, partial=True)
+    if serializer.is_valid():
+        serializer.save()
+        return Response(serializer.data, status=200)
+    return Response(serializer.errors, status=400)
+    
+@api_view(['DELETE'])
+@admin_required
+def delete_user(request, user_id):
+    user = get_object_or_404(User, id=user_id)
+    user.delete()
+    return Response(status=204)
+
+@api_view(['GET'])
+@admin_required
+def admin_user_collection(request, user_id):
+    try:
+        user = User.objects.get(pk=user_id)
+        pokemons = user.owned_pokemon.all()
+        serializer = PokemonSerializer(pokemons, many=True)
+        return Response(serializer.data)
+    except User.DoesNotExist:
+        return Response({'detail': 'User not found'}, status=404)
+
+@api_view(['GET'])
+@admin_required
+def admin_user_transactions(request, user_id):
+    try:
+        user = User.objects.get(pk=user_id)
+        bids = Bids.objects.filter(bidder=user)
+        asks = Asks.objects.filter(asker=user)
+
+        bid_data = BidsSerializer(bids, many=True).data
+        ask_data = AsksSerializer(asks, many=True).data
+
+        return Response({'bids': bid_data, 'asks': ask_data})
+    except User.DoesNotExist:
+        return Response({'detail': 'User not found'}, status=404)

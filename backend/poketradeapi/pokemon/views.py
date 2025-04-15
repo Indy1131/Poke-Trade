@@ -1,4 +1,5 @@
 from django.shortcuts import render
+from poketradeapi.utils import admin_required
 from pokemon.models import Pokemon
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
@@ -53,3 +54,33 @@ def get_user_pokemon(request):
         enriched.append(p)
 
     return Response(enriched, status=status.HTTP_200_OK)
+
+@api_view(['GET'])
+@admin_required
+def get_all_pokemon(request):
+    pokemon = Pokemon.objects.all()
+    serializer = PokemonSerializer(pokemon, many=True)
+    return Response(serializer.data)
+
+@api_view(['PUT'])
+@admin_required
+def update_pokemon(request, pokemon_id):
+    try:
+        pokemon = Pokemon.objects.get(pk=pokemon_id)
+        serializer = PokemonSerializer(pokemon, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response({'detail': 'Pokemon updated'})
+        return Response(serializer.errors, status=400)
+    except Pokemon.DoesNotExist:
+        return Response({'detail': 'Pokemon not found'}, status=404)
+
+@api_view(['DELETE'])
+@admin_required
+def delete_pokemon(request, pokemon_id):
+    try:
+        pokemon = Pokemon.objects.get(pk=pokemon_id)
+        pokemon.delete()
+        return Response({'detail': 'Pokemon deleted'})
+    except Pokemon.DoesNotExist:
+        return Response({'detail': 'Pokemon not found'}, status=404)
