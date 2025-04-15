@@ -73,18 +73,26 @@ export default function Dashboard() {
             </span>
           </h1>
           <div
-            className="grid w-full p-6 gap-6"
+            className="grid w-full p-6 justify-center"
             style={{
-              gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))",
+              gridTemplateColumns: "repeat(auto-fill, minmax(210px, 1fr))",
             }}
           >
-            {data
-              ? data.length == 0
-                ? "No Pokemon found."
-                : data.map((pokemon: Pokemon) => {
-                    return <PokeCard key={pokemon.id} pokemon={pokemon} />;
-                  })
-              : "Loading..."}
+            {data ? (
+              data.length == 0 ? (
+                "No Pokemon found."
+              ) : (
+                data.map((pokemon: Pokemon) => {
+                  return <PokeCard key={pokemon.id} pokemon={pokemon} />;
+                })
+              )
+            ) : (
+              <>
+                <PokeCard />
+                <PokeCard />
+                <PokeCard />
+              </>
+            )}
           </div>
         </div>
       </div>

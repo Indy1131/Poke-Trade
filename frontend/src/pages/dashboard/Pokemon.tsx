@@ -85,7 +85,12 @@ export default function Pokemon() {
                   </div>
                 </>
               ) : (
-                "No data"
+                <div className="border-2 border-outline rounded-md flex flex-col items-center relative h-[400px] w-[400px] overflow-hidden p-2 bg-gradient-to-tr from-outline via-white to-white">
+                  <h1 className="absolute top-1 left-1 text-xl text-outline">
+                    Loading
+                  </h1>
+                  <div></div>
+                </div>
               )}
             </div>
           </div>

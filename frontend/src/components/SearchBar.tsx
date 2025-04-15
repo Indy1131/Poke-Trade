@@ -27,7 +27,7 @@ export default function SearchBar({ className }: Props) {
 
   return (
     <form
-      className={`flex justify-center py-3 ${className}`}
+      className={`flex justify-center py-3 z-5 ${className}`}
       onSubmit={handleSubmit}
     >
       <input

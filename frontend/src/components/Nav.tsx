@@ -16,10 +16,10 @@ export default function Nav() {
   return (
     <nav className="w-[100vw] sticky top-0 z-10">
       <div className="w-full h-[4rem] z-20 font-medium">
-        {/* <div className="absolute flex justify-center w-full top-0 h-[calc(4rem+20px)] pointer-events-none overflow-hidden">
+        {/* <div className="absolute flex justify-center w-full top-0 h-[calc(4rem+100px)] pointer-events-none overflow-hidden">
           <div
             className="top-0 w-[calc(100vw+100px)] flex-none h-[4rem]"
-            style={{ boxShadow: "0px 4px 20px -10px black" }}
+            style={{ boxShadow: "0px 30px 30px 0 white" }}
           />
         </div> */}
         <div className="w-full h-full flex items-center px-3 gap-8 bg-white">
@@ -39,7 +39,12 @@ export default function Nav() {
                     <h1 className="text-xs">{user.username}</h1>
                     <h1 className="ml-auto text-green-400 text-xs">$10000</h1>
                   </div>
-                  <button onClick={handleClick} className="text-sm ml-auto cursor-pointer">Logout</button>
+                  <button
+                    onClick={handleClick}
+                    className="text-sm ml-auto cursor-pointer"
+                  >
+                    Logout
+                  </button>
                 </div>
               )}
             </>

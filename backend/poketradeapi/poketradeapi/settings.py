@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'django_rest_passwordreset',
     'corsheaders',
+    'trade',
     'market',
 ]
 
@@ -154,4 +155,3 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-

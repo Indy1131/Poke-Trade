@@ -74,6 +74,7 @@ export default function Signup() {
         <form
           className="bg-white border-0 border-outline flex flex-col gap-2 box-border p-4 rounded-md w-[500px]"
           onSubmit={handleSubmit}
+          noValidate
         >
           <div>
             <h1 className="text-4xl font-medium py-2 mb-4 bg-gradient-to-l from-primary to-secondary bg-clip-text text-transparent inline-block">
