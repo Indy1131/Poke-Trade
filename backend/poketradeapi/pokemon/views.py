@@ -15,9 +15,16 @@ def get_pokemon(request, pokemon_id):
     except(Pokemon.DoesNotExist):
         return Response(data = {'detail':'pokemon not found'}, status = status.HTTP_404_NOT_FOUND)
     
-@api_view(['GET'])
-# @permission_classes([IsAuthenticated])  # Ensure only logged-in users can access this endpoint
-def user_pokemon_collection(request):
-    user_pokemon = Pokemon.objects.filter(owner_user=request.user)  # Get Pokémon owned by the logged-in user
-    serializer = PokemonSerializer(user_pokemon, many=True)
-    return Response(serializer.data)  # Return JSON response
+@api_view(['PUT'])
+def create_pokemon(request):
+    try:
+        serializer = PokemonSerializer(data = request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(data = {'detail':'pokemon successfully created'},status = status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    except Exception as e:
+        return Response({'error':str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+        
+

@@ -3,5 +3,6 @@ from . import views
 
 urlpatterns = [
             path('<int:pokemon_id>/', views.get_pokemon, name = 'get_pokemon'),
-            path('user/collection/', user_pokemon_collection, name='user_pokemon_collection'),
+            path('create/', views.create_pokemon, name = 'create_pokemon'),
+
 ]

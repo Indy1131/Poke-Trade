@@ -1,9 +1,8 @@
 from django.apps import AppConfig
 
-
 class UserConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
-    name = 'user'
+    name = 'user'  # Make sure this matches your app folder name
 
     def ready(self):
-        import user.signals  # Ensure the signals are loaded when Django starts
+        import user.password_reset_signal_handler
