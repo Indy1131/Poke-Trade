@@ -32,7 +32,7 @@ export default function Nav() {
               <Link to="/dashboard/transactions">Transactions</Link>
               {user && (
                 <div className="flex items-center gap-2 w-[200px] py-2 px-2">
-                  <h1 className=" bg-secondary rounded-full text-center w-[2.5rem] h-[2.5rem] flex items-center justify-center text-xl text-white">
+                  <h1 className=" bg-gradient-to-tr from-primary via-secondary to-secondary rounded-full text-center w-[2.5rem] h-[2.5rem] pt-[2px] flex items-center justify-center text-xl text-white">
                     {user.username[0].toUpperCase()}
                   </h1>
                   <div>
@@ -41,9 +41,9 @@ export default function Nav() {
                   </div>
                   <button
                     onClick={handleClick}
-                    className="text-sm ml-auto cursor-pointer"
+                    className="text-sm ml-auto cursor-pointer h-[1.4rem] w-[1.4rem]"
                   >
-                    Logout
+                    <img src="/log-out.png" />
                   </button>
                 </div>
               )}

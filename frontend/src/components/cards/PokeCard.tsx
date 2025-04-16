@@ -14,7 +14,7 @@ type Pokemon = {
 export default function PokeCard({ pokemon }: Props) {
   if (!pokemon) {
     return (
-      <div className="flex justify-center transition-all duration-75 ease-out items-center w-[210px] h-[210px] p-[5px] hover:p-0">
+      <div className="flex justify-center transition-all duration-75 ease-out items-center aspect-square hover:p-0 p-2 h-full w-full">
         <div className="border-2 border-outline rounded-md flex flex-col items-center relative h-full w-full overflow-hidden p-2 bg-gradient-to-tr from-outline via-white to-white">
           <h1 className="absolute top-1 left-1 text-xl text-outline">
             Loading
@@ -27,7 +27,7 @@ export default function PokeCard({ pokemon }: Props) {
   return (
     <Link
       to={`/dashboard/pokemon/${pokemon.id}`}
-      className="flex justify-center transition-all duration-75 ease-out items-center aspect-square hover:p-0 p-2"
+      className="flex justify-center transition-all duration-75 ease-out items-center aspect-square hover:p-0 p-2 h-full w-full"
     >
       <div className="border-2 border-outline rounded-md flex flex-col items-center relative h-full w-full overflow-hidden p-2 bg-gradient-to-tr from-outline via-white to-white">
         <h1 className="absolute top-1 left-1 text-xl text-outline">

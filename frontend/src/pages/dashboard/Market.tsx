@@ -1,7 +1,5 @@
 import { Link, useSearchParams } from "react-router-dom";
 import SearchBar from "../../components/SearchBar";
-import PokeCard from "../../components/cards/PokeCard";
-import Skeleton from "../../components/cards/Skeleton";
 import Listing from "../../components/cards/Listing";
 
 export default function Market() {
@@ -31,7 +29,7 @@ export default function Market() {
                 to="/dashboard/transactions"
                 className="bg-gradient-to-l from-primary to-secondary bg-clip-text text-transparent"
               >
-                View your trades
+                Go to your transactions
               </Link>
             </h1>
           </div>
@@ -39,8 +37,14 @@ export default function Market() {
             <h1>My Listings</h1>
             <div className="absolute h-full w-[10px] bg-gradient-to-r from-white to-transparent z-3" />
             <div className="absolute right-10 h-full w-[10px] bg-gradient-to-l from-white to-transparent z-3" />
-            <div className="w-full overflow-scroll relative">
-              <div className="flex items-center my-5 w-max px-[10px]">
+            <div className="w-full overflow-x-scroll overflow-y-hidden relative h-[230px] pb-10 mt-2">
+              <div className="flex items-center w-max px-[10px] h-full">
+                <Listing />
+                <Listing />
+                <Listing />
+                <Listing />
+                <Listing />
+                <Listing />
                 <Listing />
                 <Listing />
                 <Listing />
@@ -60,9 +64,9 @@ export default function Market() {
             </span>
           </h1>
           <div
-            className="grid w-full p-6 gap-2"
+            className="grid w-full p-6 justify-center gap-y-6"
             style={{
-              gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))",
+              gridTemplateColumns: "repeat(auto-fill, minmax(210px, 1fr))",
             }}
           >
             {/* {data ? (

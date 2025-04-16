@@ -2,7 +2,6 @@ import { useState } from "react";
 import Button from "../components/form/Button";
 import Input from "../components/form/Input";
 import { Link, useNavigate } from "react-router-dom";
-import { useAuth } from "../hooks/useAuth";
 
 const BASE_URL = import.meta.env.VITE_BASE_URL;
 
