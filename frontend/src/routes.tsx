@@ -9,6 +9,7 @@ import Signup from "./pages/Signup";
 import Market from "./pages/dashboard/Market";
 import Transactions from "./pages/dashboard/Transactions";
 import Pokemon from "./pages/dashboard/Pokemon";
+import ForgotPassword from "./pages/ForgotPassword";
 
 export default [
   {
@@ -41,6 +42,14 @@ export default [
         element: (
           <GuestRoute>
             <Signup />
+          </GuestRoute>
+        ),
+      },
+      {
+        path: "/forgot-password",
+        element: (
+          <GuestRoute>
+            <ForgotPassword />
           </GuestRoute>
         ),
       },

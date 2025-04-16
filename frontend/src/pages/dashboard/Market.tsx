@@ -44,17 +44,6 @@ export default function Market() {
                 <Listing />
                 <Listing />
                 <Listing />
-                <Listing />
-                <Listing />
-                <Listing />
-                <Listing />
-                <Listing />
-                <Listing />
-                <Listing />
-                <Listing />
-                <Listing />
-                <Listing />
-                <Listing />
               </div>
             </div>
           </div>
@@ -91,15 +80,6 @@ export default function Market() {
                 <Skeleton />
               </>
             )} */}
-            <Listing />
-            <Listing />
-            <Listing />
-            <Listing />
-            <Listing />
-            <Listing />
-            <Listing />
-            <Listing />
-            <Listing />
             <Listing />
             <Listing />
             <Listing />

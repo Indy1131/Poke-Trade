@@ -8,18 +8,17 @@ const BASE_URL = import.meta.env.VITE_BASE_URL;
 
 type Data = { [key: string]: string[] | string | null };
 
-export default function Login() {
-  const { login } = useAuth();
+export default function ForgotPassword() {
   const navigate = useNavigate();
 
-  const [formData, setFormData] = useState({ username: "", password: "" });
+  const [formData, setFormData] = useState({ email: "" });
   const [errors, setErrors] = useState<Data>({});
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
 
     try {
-      const response = await fetch(`${BASE_URL}/api/user/login/`, {
+      const response = await fetch(`${BASE_URL}/api/password_reset/`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -28,19 +27,20 @@ export default function Login() {
       });
       const json = (await response.json()) as Data;
 
-      if (!json.refresh || !json.access) {
+      if (response.status != 201) {
         const newErrors = {} as Data;
         for (const key of Object.keys(json)) {
           newErrors[key] = json[key];
         }
 
+        console.log(newErrors);
+
         setErrors(newErrors);
         return;
       }
 
-      login(json as { access: string; refresh: string });
       console.log("redirecting");
-      navigate("/dashboard", { replace: true });
+      navigate("/login", { replace: true });
     } catch {
       setErrors({
         detail: "There was an error requesting the server. Try again later.",
@@ -68,42 +68,26 @@ export default function Login() {
         >
           <div>
             <h1 className="text-4xl font-medium py-2 mb-4 bg-gradient-to-l from-primary to-secondary bg-clip-text text-transparent inline-block">
-              Log in
+              Forgot Password
             </h1>
           </div>
           <Input
-            name="username"
-            label="Username"
+            type="email"
+            name="email"
+            label="Email"
             className="max-w-[500px]"
-            value={formData.username}
+            value={formData.email}
             onChange={handleChange}
             onFocus={handleFocus}
-            error={errors.username}
+            error={errors.email}
             noLabel
           />
-          <Input
-            type="password"
-            name="password"
-            label="Password"
-            className="max-w-[500px]"
-            value={formData.password}
-            onChange={handleChange}
-            onFocus={handleFocus}
-            error={errors.password}
-            noLabel
-          />
-          <Button className="w-full self-center" text="Log in" />
+          <Button className="w-full self-center" text="Send recovery email" />
           <div className="flex justify-between text-sm">
-            <Link to="/signup">
-              Not registered?{" "}
+            <Link to="/login">
+              Know your login?{" "}
               <span className="bg-gradient-to-l from-primary to-secondary bg-clip-text text-transparent">
-                Sign up
-              </span>
-            </Link>
-            <Link to="/forgot-password">
-              Forgot your password?{" "}
-              <span className="bg-gradient-to-l from-primary to-secondary bg-clip-text text-transparent">
-                Click here
+                Log in
               </span>
             </Link>
           </div>

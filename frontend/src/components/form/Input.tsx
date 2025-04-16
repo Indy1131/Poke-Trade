@@ -39,7 +39,6 @@ export default function Input({
         value={value}
         onChange={onChange}
         onFocus={onFocus}
-        formNoValidate
       />
       <h1 className="text-primary h-[1rem] my-1">{error ? error[0] : ""}</h1>
     </div>
