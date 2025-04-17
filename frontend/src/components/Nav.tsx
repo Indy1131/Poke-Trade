@@ -37,7 +37,7 @@ export default function Nav() {
                   </h1>
                   <div>
                     <h1 className="text-xs">{user.username}</h1>
-                    <h1 className="ml-auto text-green-400 text-xs">$10000</h1>
+                    <h1 className="ml-auto text-green-400 text-xs">${user.balance}</h1>
                   </div>
                   <button
                     onClick={handleClick}

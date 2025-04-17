@@ -5,7 +5,7 @@ from pokemon.models import Pokemon
 
 class Balance(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True, related_name="balance")
-    balance = models.PositiveIntegerField(default = 0)
+    balance = models.PositiveIntegerField(default = 5000)
 
 class Bids(models.Model):
     STATUS_CHOICES = [

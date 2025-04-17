@@ -5,6 +5,7 @@ const BASE_URL = import.meta.env.VITE_BASE_URL;
 type User = {
   username: string;
   email: string;
+  balance: number;
 };
 
 // eslint-disable-next-line react-refresh/only-export-components
@@ -24,6 +25,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     ?.split("=")[1];
   const [token, setToken] = useState<string | undefined>(access);
   const [user, setUser] = useState(null);
+
+  console.log(user);
 
   useEffect(() => {
     if (!token) return;

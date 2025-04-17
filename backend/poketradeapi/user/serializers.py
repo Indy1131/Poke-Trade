@@ -11,7 +11,5 @@ class UserSerializer(serializers.ModelSerializer):
         fields = ['id','username','email','password','balance']
 
     def get_balance(self, user):
-        try:
-            return user.balance.balance
-        except Balance.DoesNotExist:
-            return 0
+        balance_obj, created = Balance.objects.get_or_create(user=user, defaults={'balance': 5000})
+        return balance_obj.balance
