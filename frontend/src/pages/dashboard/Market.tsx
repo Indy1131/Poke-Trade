@@ -37,14 +37,8 @@ export default function Market() {
             <h1>My Listings</h1>
             <div className="absolute h-full w-[10px] bg-gradient-to-r from-white to-transparent z-3" />
             <div className="absolute right-10 h-full w-[10px] bg-gradient-to-l from-white to-transparent z-3" />
-            <div className="w-full overflow-x-scroll overflow-y-hidden relative h-[230px] pb-10 mt-2">
+            <div className="w-full overflow-x-scroll overflow-y-hidden relative h-[210px] pb-8 pt-4 box-content">
               <div className="flex items-center w-max px-[10px] h-full">
-                <Listing />
-                <Listing />
-                <Listing />
-                <Listing />
-                <Listing />
-                <Listing />
                 <Listing />
                 <Listing />
                 <Listing />

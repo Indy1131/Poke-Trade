@@ -22,7 +22,7 @@ export default function Nav() {
             style={{ boxShadow: "0px 30px 30px 0 white" }}
           />
         </div> */}
-        <div className="w-full h-full flex items-center px-3 gap-8 bg-white">
+        <div className="w-full h-full flex items-center px-3 gap-8 bg-white text-xs sm:text-sm">
           {path.startsWith("/dashboard") ? (
             <>
               <Link to="/dashboard">Poke Trade</Link>
@@ -31,7 +31,7 @@ export default function Nav() {
               </Link>
               <Link to="/dashboard/transactions">Transactions</Link>
               {user && (
-                <div className="flex items-center gap-2 w-[200px] py-2 px-2">
+                <div className="flex items-center gap-2 w-[200px] py-2 px-2 select-none">
                   <h1 className=" bg-gradient-to-tr from-primary via-secondary to-secondary rounded-full text-center w-[2.5rem] h-[2.5rem] pt-[2px] flex items-center justify-center text-xl text-white">
                     {user.username[0].toUpperCase()}
                   </h1>

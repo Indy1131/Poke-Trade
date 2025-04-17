@@ -1,5 +1,6 @@
 import { Link, useSearchParams } from "react-router-dom";
 import SearchBar from "../../components/SearchBar";
+import Transaction from "../../components/cards/Transaction";
 
 export default function Transactions() {
   const [searchParams] = useSearchParams();
@@ -31,6 +32,29 @@ export default function Transactions() {
                 Go to your collection
               </Link>
             </h1>
+            <div className="sticky top-0 bg-gradient-to-b from-white to-transparent w-full z-1">
+              <SearchBar className="w-full" />
+            </div>
+            <h1 className="px-10 block w-full mb-3">
+              {search ? "Showing results for " : "Showing "}
+              <span className="bg-gradient-to-l from-primary to-secondary bg-clip-text text-transparent italic pr-2">
+                {search ? search : "all results"}
+              </span>
+            </h1>
+            <div className="px-10 flex flex-col gap-4">
+              <Transaction />
+              <Transaction />
+              <Transaction />
+              <Transaction />
+              <Transaction />
+              <Transaction />
+              <Transaction />
+              <Transaction />
+              <Transaction />
+              <Transaction />
+              <Transaction />
+              <Transaction />
+            </div>
           </div>
         </div>
       </div>

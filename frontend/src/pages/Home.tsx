@@ -5,10 +5,10 @@ import InfiniteCarousel from "../components/InfiniteCarousel";
 export default function Home() {
   return (
     <div className="flex-1 flex flex-col items-center relative">
-      <h1 className="mt-40 mb-5 text-7xl font-medium bg-gradient-to-l from-primary to-secondary bg-clip-text text-transparent">
+      <h1 className="mt-40 mb-5  text-4xl sm:text-7xl font-medium bg-gradient-to-l from-primary to-secondary bg-clip-text text-transparent">
         Gotta catch 'em all.
       </h1>
-      <h2 className="text-3xl mb-15">The best platform for Pokemon fans.</h2>
+      <h2 className="text-xl sm:text-3xl mb-15">The best platform for Pokemon fans.</h2>
       <div className="w-full flex justify-center">
         <InfiniteCarousel className="w-[min(800px,100%)]">
           <img src="/diamond.webp" className="h-[100px] w-auto px-5" />
@@ -26,7 +26,7 @@ export default function Home() {
         </InfiniteCarousel>
       </div>
       <div className="flex flex-col items-center mb-10">
-        <div className="sticky top-[100px] pt-[200px] mt-20 flex justify-center overflow-hidden">
+        <div className="sticky top-[100px] pt-[200px] mt-20 flex justify-center overflow-hidden w-full sm:w-auto">
           <img
             src="/groudon.png"
             className="w-full min-w-[700px] absolute top-0 z-1"
@@ -39,9 +39,9 @@ export default function Home() {
           </div>
         </div>
         <div className="w-[min(1000px,calc(100%-60px))]">
-          <div className="grid grid-cols-2 gap-10 mt-20 px-10">
+          <div className="grid grid-cols-2 gap-10 mt-20 sm:px-10">
             <Card className="flex-1">
-              <h1 className="text-black text-4xl py-5 h-30">
+              <h1 className="text-black text-2xl sm:text-4xl py-5 h-30">
                 <span className="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
                   Collect
                 </span>{" "}
@@ -53,7 +53,7 @@ export default function Home() {
               </p>
             </Card>
             <Card className="flex-1">
-              <h1 className="text-black text-4xl py-5 h-30">
+              <h1 className="text-black text-2xl sm:text-4xl  py-5 h-30">
                 <span className="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
                   Trade
                 </span>{" "}
@@ -65,7 +65,7 @@ export default function Home() {
               </p>
             </Card>
             <Card className="flex-1">
-              <h1 className="text-black text-4xl py-5 h-30">
+              <h1 className="text-black text-2xl sm:text-4xl  py-5 h-30">
                 <span className="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
                   Sell
                 </span>{" "}
@@ -77,7 +77,7 @@ export default function Home() {
               </p>
             </Card>
             <Card className="flex-1">
-              <h1 className="text-black text-4xl py-5 h-30">
+              <h1 className="text-black text-2xl sm:text-4xl py-5 h-30">
                 <span className="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
                   Socialize
                 </span>{" "}
@@ -91,16 +91,16 @@ export default function Home() {
           </div>
         </div>
       </div>
-      <h1 className="mt-20 text-7xl pb-2 pt-2 font-medium bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent mb-6">
+      <h1 className="mt-20 text-4xl sm:text-7xl pb-2 pt-2 font-medium bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent mb-6">
         Everything for you.
       </h1>
-      <h2 className="text-3xl">Tons of features.</h2>
+      <h2 className="text-2xl sm:text-3xl">Tons of features.</h2>
       <div className="flex flex-col items-center w-full bg-gradient-to-b from-primary to-secondary relative mb-10">
         <div className="absolute bg-gradient-to-b from-white to-transparent w-full h-[600px] top-0 z-0" />
         <div className="z-1 flex flex-col items-center bg-white rounded-t-xl mt-10 pb-20 w-[calc(100%-60px)]">
           <img src="/pokeball.png" className="w-[900px] mt-5" />
           <Chips
-            className="w-[760px]"
+            className="sm:w-[760px]"
             words={[
               "Trade with friends",
               "List Pokemon",
