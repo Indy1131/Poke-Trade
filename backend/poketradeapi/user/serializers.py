@@ -1,9 +1,17 @@
 from django.contrib.auth.models import User
 from rest_framework import serializers
+from market.models import Balance
 
 class UserSerializer(serializers.ModelSerializer):
     email = serializers.EmailField(required=True) 
+    balance = serializers.SerializerMethodField()
+
     class Meta:
         model = User
-        fields = ['id','username','email','password']
+        fields = ['id','username','email','password','balance']
 
+    def get_balance(self, user):
+        try:
+            return user.balance.balance
+        except Balance.DoesNotExist:
+            return 0

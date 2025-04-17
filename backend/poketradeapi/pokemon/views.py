@@ -38,15 +38,16 @@ def get_user_pokemon(request):
     if not user.is_authenticated:
         return Response({'detail': 'Authentication required'}, status=status.HTTP_401_UNAUTHORIZED)
     
-    search = request.GET.get('keyword', '').lower()
+    search = request.GET.get('search', '').lower()
 
-    pokemons = user.owned_pokemon.all() 
+    pokemons = user.owned_pokemon.all()
     base_data = PokemonSerializer(pokemons, many=True).data
     enriched = []
+
     for p in base_data:
         api_data = fetch_pokeapi_data(p['poke_dex_id'])
         if search and api_data:
-            if search not in api_data['name']:
+            if search not in api_data['name'].lower():
                 continue
         p['api_data'] = api_data or {}
         enriched.append(p)
