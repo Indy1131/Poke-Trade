@@ -1,145 +1,87 @@
 from django.test import TestCase
-from django.contrib.auth.models import User
-from rest_framework.test import APIClient, APITestCase
+from rest_framework.test import APIClient
 from rest_framework import status
+from django.contrib.auth.models import User
 from pokemon.models import Pokemon
-from trade.models import Trade
+from trade.models import Trade, Transaction
 
-class TradeModelTests(APITestCase):
 
+class TradeRouteTests(TestCase):
     def setUp(self):
+        self.client = APIClient()
+
+        # Create users
         self.user1 = User.objects.create_user(username='ash', password='pikachu123')
-        self.user2 = User.objects.create_user(username='misty', password='togepi123')
+        self.user2 = User.objects.create_user(username='misty', password='staryu456')
 
-        self.pokemon1 = Pokemon.objects.create(poke_dex_id=1, owner_user=self.user1)
-        self.pokemon2 = Pokemon.objects.create(poke_dex_id=2, owner_user=self.user2)
+        # Create Pokémon
+        self.pokemon1 = Pokemon.objects.create(poke_dex_id=25, owner_user=self.user1)
+        self.pokemon2 = Pokemon.objects.create(poke_dex_id=120, owner_user=self.user2)
 
-    def test_create_trade_request(self):
-        self.client.force_authenticate(user=self.user1)
-
-        response = self.client.post('/trade/create/', {
-            'recipient': self.user2.id,
-            'pokemon_requested': self.pokemon2.id,
-            'pokemon_offered': self.pokemon1.id,
-            'trade_type': 'trade',
-        })
-
-        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.assertEqual(Trade.objects.count(), 1)
-
-    def test_create_purchase_request(self):
-        self.client.force_authenticate(user=self.user1)
-
-        response = self.client.post('/trade/create/', {
-            'recipient': self.user2.id,
-            'pokemon_requested': self.pokemon2.id,
-            'trade_type': 'purchase',
-        })
-
-        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.assertEqual(Trade.objects.first().trade_type, 'purchase')
-
-    def test_get_user_trades(self):
-        Trade.objects.create(
+        # Create a trade offer: user1 offers their Pokemon for user2's
+        self.trade = Trade.objects.create(
             requester=self.user1,
             recipient=self.user2,
-            pokemon_requested=self.pokemon2,
             pokemon_offered=self.pokemon1,
-            trade_type='trade'
+            pokemon_requested=self.pokemon2,
+            status='pending'
         )
 
-        self.client.force_authenticate(user=self.user1)
-        response = self.client.get('/trade/my-trades/')
+    def test_get_offers(self):
+        self.client.force_authenticate(user=self.user2)  # owner of requested Pokemon
+        response = self.client.get('/trade/offers/')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 1)
+        self.assertEqual(response.data[0]['id'], self.trade.id)
+
+    def test_get_outbound(self):
+        self.client.force_authenticate(user=self.user1)  # owner of offered Pokemon
+        response = self.client.get('/trade/outbound/')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 1)
+        self.assertEqual(response.data[0]['id'], self.trade.id)
+
+    def test_accept_offer(self):
+        self.client.force_authenticate(user=self.user2)
+
+        response = self.client.post(f'/trade/accept/{self.trade.id}/')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-    def test_get_incoming_requests(self):
-        Trade.objects.create(
-            requester=self.user1,
-            recipient=self.user2,
-            pokemon_requested=self.pokemon2,
-            pokemon_offered=self.pokemon1,
-            trade_type='trade'
-        )
-
-        self.client.force_authenticate(user=self.user2)
-        response = self.client.get('/trade/incoming/')
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-
-    def test_update_trade_status(self):
-        trade = Trade.objects.create(
-            requester=self.user1,
-            recipient=self.user2,
-            pokemon_requested=self.pokemon2,
-            trade_type='purchase'
-        )
-
-        self.client.force_authenticate(user=self.user2)
-        response = self.client.post(f'/trade/update-status/{trade.id}/', {'status': 'approved'})
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-
-    def test_invalid_status_update(self):
-        trade = Trade.objects.create(
-            requester=self.user1,
-            recipient=self.user2,
-            pokemon_requested=self.pokemon2,
-            trade_type='purchase'
-        )
-
-        self.client.force_authenticate(user=self.user2)
-        response = self.client.post(f'/trade/update-status/{trade.id}/', {'status': 'unknown'})
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-
-    def test_accept_purchase_request_transfers_ownership(self):
-        trade = Trade.objects.create(
-            requester=self.user1,
-            recipient=self.user2,
-            pokemon_requested=self.pokemon2,
-            trade_type='purchase'
-        )
-
-        self.client.force_authenticate(user=self.user2)
-        response = self.client.post(f'/trade/update-status/{trade.id}/', {'status': 'approved'})
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-
-        trade.refresh_from_db()
-        self.pokemon2.refresh_from_db()
-        self.assertEqual(trade.status, 'completed')
-        self.assertEqual(self.pokemon2.owner_user, self.user1)
-
-    def test_accept_trade_request_swaps_ownership(self):
-        trade = Trade.objects.create(
-            requester=self.user1,
-            recipient=self.user2,
-            pokemon_requested=self.pokemon2,
-            pokemon_offered=self.pokemon1,
-            trade_type='trade'
-        )
-
-        self.client.force_authenticate(user=self.user2)
-        response = self.client.post(f'/trade/update-status/{trade.id}/', {'status': 'approved'})
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-
+        self.trade.refresh_from_db()
         self.pokemon1.refresh_from_db()
         self.pokemon2.refresh_from_db()
+
+        # Ownership should be swapped
         self.assertEqual(self.pokemon1.owner_user, self.user2)
         self.assertEqual(self.pokemon2.owner_user, self.user1)
 
-    def test_decline_trade_does_not_change_ownership(self):
-        trade = Trade.objects.create(
-            requester=self.user1,
-            recipient=self.user2,
-            pokemon_requested=self.pokemon2,
-            pokemon_offered=self.pokemon1,
-            trade_type='trade'
-        )
+        # Trade should be completed
+        self.assertEqual(self.trade.status, 'completed')
+
+        # A transaction should be recorded
+        transactions = Transaction.objects.filter(trade=self.trade)
+        self.assertEqual(transactions.count(), 1)
+        self.assertEqual(transactions.first().buyer, self.user1)
+
+    def test_reject_trade(self):
+        self.client.force_authenticate(user=self.user2)
+
+        response = self.client.delete(f'/trade/reject/{self.trade.id}/')
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+
+        self.assertFalse(Trade.objects.filter(id=self.trade.id).exists())
+
+    def test_get_transactions(self):
+        # Accept the trade first to create a transaction
+        self.client.force_authenticate(user=self.user2)
+        self.client.post(f'/trade/accept/{self.trade.id}/')
+
+        self.client.force_authenticate(user=self.user1)
+        response = self.client.get('/trade/transactions/')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 1)
 
         self.client.force_authenticate(user=self.user2)
-        response = self.client.post(f'/trade/update-status/{trade.id}/', {'status': 'rejected'})
+        response = self.client.get('/trade/transactions/')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-
-        trade.refresh_from_db()
-        self.pokemon1.refresh_from_db()
-        self.pokemon2.refresh_from_db()
-        self.assertEqual(trade.status, 'rejected')
-        self.assertEqual(self.pokemon1.owner_user, self.user1)
-        self.assertEqual(self.pokemon2.owner_user, self.user2)
+        self.assertEqual(len(response.data), 1)
