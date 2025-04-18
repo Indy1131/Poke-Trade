@@ -7,11 +7,45 @@ import { Name } from "../../components/Type";
 const BASE_URL = import.meta.env.VITE_BASE_URL;
 
 type Pokemon = {
-  api_data: { sprite: string; name: string; types: Name[] };
+  api_data: {
+    sprite: string;
+    name: string;
+    stats: { [key: string]: number };
+    types: Name[];
+  };
   id: number;
   owner_user: number;
   poke_dex_id: number;
 };
+
+const colors = [
+  { value: 50, color: [255, 0, 0] },
+  { value: 80, color: [255, 152, 2] },
+  { value: 100, color: [255, 254, 3] },
+  { value: 150, color: [0, 255, 43] },
+  { value: 200, color: [0, 255, 255] },
+];
+
+function getColor(value: number) {
+  value = Math.min(value, 200);
+
+  let floor = 0;
+  while (floor < colors.length - 1 && colors[floor + 1].value < value) {
+    floor++;
+  }
+
+  const lower = colors[floor];
+  const upper = colors[floor + 1];
+
+  const range = upper.value - lower.value;
+  const rel = (value - lower.value) / range;
+
+  const interpolated = lower.color.map((c, i) =>
+    Math.round(c + (upper.color[i] - c) * rel)
+  );
+
+  return interpolated;
+}
 
 export default function Pokemon() {
   const { token } = useAuth();
@@ -64,28 +98,60 @@ export default function Pokemon() {
             </h1>
             <div className="w-full mt-5">
               {data ? (
-                <>
-                  <div className="border-2 border-outline rounded-md flex flex-col items-center relative h-[400px] w-[400px] overflow-hidden p-2 bg-gradient-to-tr from-outline via-white to-white">
-                    <h1 className="absolute top-1 left-1 text-xl text-outline">
-                      {name}
-                    </h1>
-                    <div className="flex-1 w-full relative">
-                      <img
-                        src={data.api_data.sprite}
-                        className="w-full h-full"
-                        style={{ imageRendering: "pixelated" }}
-                      />
+                <div className="flex flex-col lg:flex-row gap-3">
+                  <div>
+                    <div className="border-2 border-outline rounded-md flex flex-col items-center relative h-[200px] w-[200px] md:h-[400px] md:w-[400px] overflow-hidden p-2 bg-gradient-to-tr from-outline via-white to-white">
+                      <h1 className="absolute top-1 left-1 text-xl text-outline">
+                        {name}
+                      </h1>
+                      <div className="flex-1 w-full relative">
+                        <img
+                          src={data.api_data.sprite}
+                          className="w-full h-full"
+                          style={{ imageRendering: "pixelated" }}
+                        />
+                      </div>
                     </div>
-                    <div></div>
+                    <div className="flex gap-2 my-4">
+                      {data.api_data.types.map((type) => {
+                        return <Type key={type} name={type} />;
+                      })}
+                    </div>
                   </div>
-                  <div className="flex gap-2 my-4">
-                    {data.api_data.types.map((type) => {
-                      return <Type key={type} name={type} />;
+                  <div className="flex flex-col gap-[2px]">
+                    {Object.keys(data.api_data.stats).map((stat) => {
+                      const value = data.api_data.stats[stat];
+                      const percent = Math.min(
+                        Math.floor((value / 200) * 100),
+                        100
+                      );
+
+                      const color = getColor(value);
+
+                      return (
+                        <div className="flex gap-2" key={stat}>
+                          <div className="w-[100px]">
+                            <h1>{stat}</h1>
+                          </div>
+                          <div className="w-[30px] font-medium">{value}</div>
+                          <div className="w-[300px]">
+                            <div
+                              className="h-full rounded-sm overflow-hidden"
+                              style={{
+                                width: percent + "%",
+                                backgroundColor: `rgb(${color.join(",")})`,
+                              }}
+                            >
+                              <div className="w-full h-full bg-gradient-to-b from-white/40  to-transparent"/>
+                            </div>
+                          </div>
+                        </div>
+                      );
                     })}
                   </div>
-                </>
+                </div>
               ) : (
-                <div className="border-2 border-outline rounded-md flex flex-col items-center relative h-[400px] w-[400px] overflow-hidden p-2 bg-gradient-to-tr from-outline via-white to-white">
+                <div className="border-2 border-outline rounded-md flex flex-col items-center relative h-[200px] w-[200px] md:h-[400px] md:w-[400px] overflow-hidden p-2 bg-gradient-to-tr from-outline via-white to-white">
                   <h1 className="absolute top-1 left-1 text-xl text-outline">
                     Loading
                   </h1>

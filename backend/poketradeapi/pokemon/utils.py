@@ -12,11 +12,13 @@ def assign_random_pokemon_to_user(user, count=3):
     return created
 
 def fetch_pokeapi_data(poke_dex_id):
+    # PokeAPICache.objects.all().delete()
     # Try cache first
     try:
         cache = PokeAPICache.objects.get(poke_dex_id=poke_dex_id)
         return {
             'name': cache.name,
+            'stats': cache.stats,
             'types': cache.types,
             'sprite': cache.sprite
         }
@@ -29,21 +31,29 @@ def fetch_pokeapi_data(poke_dex_id):
         if res.status_code == 200:
             data = res.json()
 
+            stats = {"HP": data['stats'][0]['base_stat'], 
+                     "Attack": data['stats'][1]['base_stat'],
+                     "Defense": data['stats'][2]['base_stat'], 
+                     "Sp. Atk": data['stats'][3]['base_stat'],
+                     "Sp. Def": data['stats'][4]['base_stat'], 
+                     "Speed": data['stats'][5]['base_stat']}
+
             name = data['name']
             types = [t['type']['name'] for t in data['types']]
             sprite = data['sprites']['front_default']
 
             # Save to cache
-            if not PokeAPICache.objects.filter(poke_dex_id=poke_dex_id).exists():
-                PokeAPICache.objects.create(
-                    poke_dex_id=poke_dex_id,
-                    name=name,
-                    types=types,
-                    sprite=sprite
-                )
+            PokeAPICache.objects.get_or_create(
+                poke_dex_id=poke_dex_id,
+                name=name,
+                stats=stats,
+                types=types,
+                sprite=sprite
+            )
 
             return {
                 'name': name,
+                'stats': stats,
                 'types': types,
                 'sprite': sprite
             }

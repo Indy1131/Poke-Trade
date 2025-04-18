@@ -29,6 +29,7 @@ export default function Nav() {
               <Link to="/dashboard/market" className="ml-auto">
                 Market
               </Link>
+              <Link to="/dashboard/trades">Trades</Link>
               <Link to="/dashboard/transactions">Transactions</Link>
               {user && (
                 <div className="flex items-center gap-2 w-[200px] py-2 px-2 select-none">
@@ -37,7 +38,9 @@ export default function Nav() {
                   </h1>
                   <div>
                     <h1 className="text-xs">{user.username}</h1>
-                    <h1 className="ml-auto text-green-400 text-xs">${user.balance}</h1>
+                    <h1 className="ml-auto text-green-400 text-xs">
+                      ${user.balance}
+                    </h1>
                   </div>
                   <button
                     onClick={handleClick}

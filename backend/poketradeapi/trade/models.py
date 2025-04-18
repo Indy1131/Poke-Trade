@@ -8,13 +8,8 @@ class Trade(models.Model):
         ('pending', 'Pending'),
         ('approved', 'Approved'),
         ('rejected', 'Rejected'),
-        ('completed', 'Completed'),
     ]
 
-    TRADE_TYPE = [
-        ('purchase', 'Purchase'),
-        ('trade', 'Trade'),
-    ]
 
     id = models.AutoField(primary_key=True)
     requester = models.ForeignKey(User, on_delete=models.CASCADE,
@@ -39,8 +34,21 @@ class Trade(models.Model):
 
     )  # target Pokemon
 
-    trade_type = models.CharField(max_length=10, choices=TRADE_TYPE)
     status = models.CharField(max_length=10, choices=TRADE_STATUS, default='pending')
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+class Purchase(models.Model):
+    buyer = models.ForeignKey(User, on_delete=models.CASCADE, related_name='purchases')
+    pokemon = models.ForeignKey(Pokemon, on_delete=models.CASCADE)
+    seller = models.ForeignKey(User, on_delete=models.CASCADE, related_name='sales')
+    price = models.PositiveIntegerField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+class Transaction(models.Model):
+    buyer = models.ForeignKey(User, on_delete=models.CASCADE, related_name='transaction_buyer')
+    seller = models.ForeignKey(User, on_delete=models.CASCADE, related_name='transaction_seller')
+    trade = models.ForeignKey(Trade, on_delete=models.CASCADE, null=True, blank=True)
+    purchase = models.ForeignKey(Purchase, on_delete=models.CASCADE, null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)

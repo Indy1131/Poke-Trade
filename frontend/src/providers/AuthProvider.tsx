@@ -26,8 +26,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [token, setToken] = useState<string | undefined>(access);
   const [user, setUser] = useState(null);
 
-  console.log(user);
-
   useEffect(() => {
     if (!token) return;
 

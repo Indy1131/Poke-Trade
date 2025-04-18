@@ -24,4 +24,5 @@ urlpatterns = [
     path('api/password_reset/', include('django_rest_passwordreset.urls', namespace='password_reset')),
     path('trade/',include('trade.urls')),
     path('api/market/',include ('market.urls')),
+    path('api/trade/', include('trade.urls')),
 ]

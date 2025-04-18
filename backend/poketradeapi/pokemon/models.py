@@ -10,6 +10,7 @@ class Pokemon(models.Model):
 class PokeAPICache(models.Model):
     poke_dex_id = models.IntegerField(unique=True)
     name = models.CharField(max_length=100)
+    stats = models.JSONField()
     types = models.JSONField()
     sprite = models.URLField()
     last_updated = models.DateTimeField(auto_now=True)

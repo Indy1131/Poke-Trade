@@ -10,6 +10,7 @@ import Market from "./pages/dashboard/Market";
 import Transactions from "./pages/dashboard/Transactions";
 import Pokemon from "./pages/dashboard/Pokemon";
 import ForgotPassword from "./pages/ForgotPassword";
+import Trades from "./pages/dashboard/Trades";
 
 export default [
   {
@@ -64,6 +65,10 @@ export default [
           {
             path: "/dashboard/market",
             element: <Market />,
+          },
+          {
+            path: "/dashboard/trades",
+            element: <Trades />,
           },
           {
             path: "/dashboard/transactions",

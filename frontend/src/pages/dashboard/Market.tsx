@@ -1,11 +1,34 @@
 import { Link, useSearchParams } from "react-router-dom";
 import SearchBar from "../../components/SearchBar";
 import Listing from "../../components/cards/Listing";
+import { useEffect, useState } from "react";
+import { useAuth } from "../../hooks/useAuth";
+
+const BASE_URL = import.meta.env.VITE_BASE_URL;
 
 export default function Market() {
+  const { token } = useAuth();
   const [searchParams] = useSearchParams();
+  const [data, setData] = useState(null);
 
   const search = searchParams.get("keyword");
+
+  useEffect(() => {
+    let url = `${BASE_URL}/api/TODO`;
+    if (search) url += `?keyword=${search}`;
+
+    async function getData() {
+      // const response = await fetch(url, {
+      //   method: "GET",
+      //   headers: {
+      //     Authorization: `Bearer ${token}`,
+      //   },
+      // });
+      // const json = await response.json();
+      // setData(json);
+    }
+    getData();
+  }, [search, token]);
 
   return (
     <>
@@ -26,10 +49,10 @@ export default function Market() {
             <h1 className="px-10">
               Want to check your offers?{" "}
               <Link
-                to="/dashboard/transactions"
+                to="/dashboard/trades"
                 className="bg-gradient-to-l from-primary to-secondary bg-clip-text text-transparent"
               >
-                Go to your transactions
+                Go to your trades
               </Link>
             </h1>
           </div>

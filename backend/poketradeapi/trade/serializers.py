@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Trade
+from .models import Trade, Purchase
 from pokemon.models import Pokemon
 
 class TradeSerializer(serializers.ModelSerializer):
@@ -12,3 +12,8 @@ class TradeSerializer(serializers.ModelSerializer):
         if data['trade_type'] == 'trade' and data.get('pokemon_offered') == data.get('pokemon_requested'):
             raise serializers.ValidationError("Offered and requested Pokemon cannot be the same.")
         return data
+
+class PurchaseSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Purchase
+        fields = '__all__'
