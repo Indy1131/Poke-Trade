@@ -7,28 +7,31 @@ import { useAuth } from "../../hooks/useAuth";
 const BASE_URL = import.meta.env.VITE_BASE_URL;
 
 export default function Market() {
-  const { token } = useAuth();
+  const { token, user } = useAuth();
   const [searchParams] = useSearchParams();
   const [data, setData] = useState(null);
 
   const search = searchParams.get("keyword");
 
   useEffect(() => {
-    let url = `${BASE_URL}/api/TODO`;
-    if (search) url += `?keyword=${search}`;
+    let url = `${BASE_URL}/api/trade/listings/`;
+    if (search) url += `?search=${search}`;
 
     async function getData() {
-      // const response = await fetch(url, {
-      //   method: "GET",
-      //   headers: {
-      //     Authorization: `Bearer ${token}`,
-      //   },
-      // });
-      // const json = await response.json();
-      // setData(json);
+      const response = await fetch(url, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      const json = await response.json();
+      setData(json);
     }
     getData();
   }, [search, token]);
+
+  const listings = data ? data.listings : null;
+  const myListings = data ? data.myListings : null;
 
   return (
     <>
@@ -58,15 +61,27 @@ export default function Market() {
           </div>
           <div className="w-full pt-6 text-4xl px-10 relative overflow-hidden">
             <h1>My Listings</h1>
-            <div className="absolute h-full w-[10px] bg-gradient-to-r from-white to-transparent z-3" />
-            <div className="absolute right-10 h-full w-[10px] bg-gradient-to-l from-white to-transparent z-3" />
-            <div className="w-full overflow-x-scroll overflow-y-hidden relative h-[210px] pb-8 pt-4 box-content">
-              <div className="flex items-center w-max px-[10px] h-full">
-                <Listing />
-                <Listing />
-                <Listing />
-              </div>
-            </div>
+            {myListings ? (
+              myListings.length == 0 ? (
+                <h1 className="text-sm py-2">
+                  Your currently have no listings.
+                </h1>
+              ) : (
+                <>
+                  <div className="absolute h-full w-[10px] bg-gradient-to-r from-white to-transparent z-3" />
+                  <div className="absolute right-10 h-full w-[200px] bg-gradient-to-l from-white to-transparent z-3" />
+                  <div className="w-full overflow-x-scroll overflow-y-hidden relative h-[210px] pb-12 pt-4 box-content">
+                    <div className="flex items-center w-max pl-[10px] pr-[200px] h-full">
+                      {myListings.map((listing) => {
+                        return <Listing key={listing.id} listing={listing} />;
+                      })}
+                    </div>
+                  </div>
+                </>
+              )
+            ) : (
+              <div className="w-full overflow-x-scroll overflow-y-hidden relative h-[210px] pb-8 pt-4 box-content" />
+            )}
           </div>
           <div className="w-full px-10 pt-6 text-4xl">
             <h1>Market Listings</h1>
@@ -86,24 +101,21 @@ export default function Market() {
               gridTemplateColumns: "repeat(auto-fill, minmax(210px, 1fr))",
             }}
           >
-            {/* {data ? (
-              data.length == 0 ? (
+            {listings ? (
+              listings.length == 0 ? (
                 "No Pokemon found."
               ) : (
-                data.map((pokemon: Pokemon) => {
-                  return <PokeCard key={pokemon.id} pokemon={pokemon} />;
+                listings.map((listing) => {
+                  return <Listing key={listing.id} listing={listing} />;
                 })
               )
             ) : (
               <>
-                <Skeleton />
-                <Skeleton />
-                <Skeleton />
+                <Listing />
+                <Listing />
+                <Listing />
               </>
-            )} */}
-            <Listing />
-            <Listing />
-            <Listing />
+            )}
           </div>
         </div>
       </div>

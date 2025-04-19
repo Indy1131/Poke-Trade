@@ -6,6 +6,7 @@ type User = {
   username: string;
   email: string;
   balance: number;
+  id: number;
 };
 
 // eslint-disable-next-line react-refresh/only-export-components

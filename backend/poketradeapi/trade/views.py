@@ -2,175 +2,400 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
-from django.db import models
-from .models import Trade
-from .serializers import TradeSerializer
-from market.models import Listing, Balance
-from .models import Purchase, Transaction
+from django.db import models, transaction
+from django.contrib.contenttypes.models import ContentType
+from .serializers import TradeSerializer, ListingSerializer, TransactionSerializer
+from market.models import Balance
+from .models import Transaction, Listing, Trade
 from pokemon.models import Pokemon
+from pokemon.utils import fetch_pokeapi_data
 
-@api_view(['POST'])
+
+@api_view(["POST"])
 @permission_classes([IsAuthenticated])
 def create_trade_request(request):
-    data = request.data.copy()
-    data['requester'] = request.user.id  # auto-assign requester
+    original_id = request.data.get("original")
+    offer_id = request.data.get("offer")
 
-    serializer = TradeSerializer(data=data)
-    if serializer.is_valid():
-        serializer.save()
-        return Response({'detail': 'Trade request submitted'}, status=status.HTTP_201_CREATED)
-    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    if not original_id or not offer_id:
+        return Response(
+            {"detail": "must have both original and offered pokemon"},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+
+    try:
+        # Fetch both Pokémon objects
+        original = Pokemon.objects.get(id=original_id)
+        offer = Pokemon.objects.get(id=offer_id)
+
+        # Get owners of each Pokémon
+        owner = original.owner_user
+        offerer = offer.owner_user
+
+        # Make sure the request user is one of the parties (typically the offerer)
+        if request.user != offerer:
+            return Response(
+                {"detail": "You must be the owner of the offered Pokémon."},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+
+        # Create trade
+        trade = Trade.objects.create(
+            owner=owner,
+            offerer=offerer,
+            original=original,
+            offer=offer,
+        )
+
+        return Response(
+            {"detail": "Trade created successfully.", "trade_id": trade.id},
+            status=status.HTTP_201_CREATED,
+        )
+
+    except Pokemon.DoesNotExist:
+        return Response(
+            {"detail": "One or both Pokémon not found."},
+            status=status.HTTP_404_NOT_FOUND,
+        )
 
 
-@api_view(['GET'])
+@api_view(["GET"])
 @permission_classes([IsAuthenticated])
 def get_user_trades(request):
-    trades = Trade.objects.filter(requester=request.user)
-    serializer = TradeSerializer(trades, many=True)
-    return Response(serializer.data, status=status.HTTP_200_OK)
+    user = request.user
 
+    outbound = Trade.objects.filter(offerer=user, completed=False)
+    inbound = Trade.objects.filter(owner=user, completed=False)
 
-@api_view(['GET'])
-@permission_classes([IsAuthenticated])
-def get_offers(request):
-    trades = Trade.objects.filter(recipient=request.user, status='pending')
-    serializer = TradeSerializer(trades, many=True)
-    return Response(serializer.data, status=status.HTTP_200_OK)
+    outbound_serialized = TradeSerializer(outbound, many=True).data
+    inbound_serialized = TradeSerializer(inbound, many=True).data
 
-@api_view(['GET'])
-@permission_classes([IsAuthenticated])
-def get_outbound_trades(request):
-    trades = Trade.objects.filter(
-        requester=request.user,
-        status='pending'
-    )
-    serializer = TradeSerializer(trades, many=True)
-    return Response(serializer.data, status=status.HTTP_200_OK)
+    for trade in outbound_serialized:
+        offer = trade["offer"]
+        original = trade["original"]
 
-@api_view(['DELETE'])
-@permission_classes([IsAuthenticated])
-def reject_trade(request, trade_id):
-    try:
-        trade = Trade.objects.get(id=trade_id)
-    except Trade.DoesNotExist:
-        return Response({'detail': 'Trade not found'}, status=status.HTTP_404_NOT_FOUND)
+        offer_api_data = fetch_pokeapi_data(offer["poke_dex_id"])
+        original_api_data = fetch_pokeapi_data(original["poke_dex_id"])
 
-    if trade.pokemon_requested.owner_user != request.user and trade.requester != request.user:
-        return Response({'detail': 'Unauthorized'}, status=status.HTTP_403_FORBIDDEN)
+        offer["api_data"] = offer_api_data or {}
+        original["api_data"] = original_api_data or {}
 
-    trade.delete()
-    return Response({'detail': 'Trade deleted'}, status=status.HTTP_204_NO_CONTENT)
+    for trade in inbound_serialized:
+        offer = trade["offer"]
+        original = trade["original"]
 
-@api_view(['POST'])
-@permission_classes([IsAuthenticated])
-def accept_offer(request, trade_id):
-    try:
-        trade = Trade.objects.get(id=trade_id)
-    except Trade.DoesNotExist:
-        return Response({'detail': 'Trade not found'}, status=status.HTTP_404_NOT_FOUND)
+        offer_api_data = fetch_pokeapi_data(offer["poke_dex_id"])
+        original_api_data = fetch_pokeapi_data(original["poke_dex_id"])
 
-    if trade.status != 'pending':
-        return Response({'detail': 'Trade already resolved'}, status=status.HTTP_400_BAD_REQUEST)
+        offer["api_data"] = offer_api_data or {}
+        original["api_data"] = original_api_data or {}
 
-    # Authorization check: only owner of requested Pokemon can accept
-    if trade.pokemon_requested.owner_user != request.user:
-        return Response({'detail': 'Unauthorized'}, status=status.HTTP_403_FORBIDDEN)
-
-    # Swap ownership
-    offered = trade.pokemon_offered
-    requested = trade.pokemon_requested
-
-    offered_owner = offered.owner_user
-    requested_owner = requested.owner_user
-
-    offered.owner_user = requested_owner
-    requested.owner_user = offered_owner
-
-    offered.save()
-    requested.save()
-
-    # Complete the trade
-    trade.status = 'completed'
-    trade.save()
-
-    # Create transaction
-    Transaction.objects.create(
-        buyer=trade.requester,  # the person who initiated the trade
-        seller=trade.recipient,  # the owner of the requested Pokémon
-        trade=trade
+    return Response(
+        {"outbound": outbound_serialized, "inbound": inbound_serialized},
+        status=status.HTTP_200_OK,
     )
 
-    return Response({'detail': 'Trade completed and transaction recorded'}, status=status.HTTP_200_OK)
 
-@api_view(['POST'])
+@api_view(["POST"])
 @permission_classes([IsAuthenticated])
-def purchase_pokemon(request, listing_id):
+def cancel_trade(request, trade_id):
+    Trade.objects.filter(id=trade_id).delete()
+
+    return Response(
+        {"detail": "Trade deleted successfully"}, status=status.HTTP_200_OK
+    )
+
+
+@api_view(["POST"])
+@permission_classes([IsAuthenticated])
+def accept_trade(request, trade_id):
+    user = request.user
+
+    if not user.is_authenticated:
+        return Response(
+            {"detail": "Authentication required"}, status=status.HTTP_401_UNAUTHORIZED
+        )
+
     try:
-        listing = Listing.objects.get(id=listing_id, status='OPEN')
-    except Listing.DoesNotExist:
-        return Response({'detail': 'Listing not found or already closed'}, status=status.HTTP_404_NOT_FOUND)
+        trade = Trade.objects.select_related("owner", 'offerer', 'original', 'offer').get(
+            id=trade_id
+        )
+    except Trade.DoesNotExist:
+        return Response(
+            {"detail": "Trade not found"}, status=status.HTTP_404_NOT_FOUND
+        )
+    
+    if trade.owner != user:
+        return Response({"detail": "Unauthorized"}, status=status.HTTP_403_FORBIDDEN)
 
-    buyer = request.user
-    seller = listing.owner
-    price = listing.ask.currency
-    pokemon_qs = listing.offer.pokemon.all()
+    if trade.completed:
+        return Response(
+            {"detail": "Trade already completed"}, status=status.HTTP_400_BAD_REQUEST
+        )
 
-    if pokemon_qs.count() != 1:
-        return Response({'detail': 'Invalid listing. Only one Pokémon should be listed per purchase.'}, status=status.HTTP_400_BAD_REQUEST)
+    with transaction.atomic():
+        newTransaction = Transaction.objects.create(
+            buyer=trade.offerer,
+            seller=trade.owner,
+            content_type=ContentType.objects.get_for_model(Trade),
+            object_id=trade_id,
+        )
 
-    pokemon = pokemon_qs.first()
+        # Swap ownership
+        original_owner = trade.owner
+        offerer = trade.offerer
 
-    # Check buyer has enough balance
-    try:
-        buyer_balance = buyer.balance
-    except Balance.DoesNotExist:
-        return Response({'detail': 'Buyer balance not found'}, status=status.HTTP_404_NOT_FOUND)
+        trade.original.owner_user = offerer
+        trade.offer.owner_user = original_owner
 
-    if buyer_balance.balance < price:
-        return Response({'detail': 'Insufficient funds'}, status=status.HTTP_400_BAD_REQUEST)
+        trade.original.save()
+        trade.offer.save()
 
-    # Deduct from buyer, add to seller
-    seller_balance, _ = Balance.objects.get_or_create(user=seller)
+        trade.completed = True
+        trade.save()
 
-    buyer_balance.balance -= price
-    seller_balance.balance += price
+        Listing.objects.filter(pokemon__in=[trade.original, trade.offer], completed=False).delete()
+        Trade.objects.filter(completed=False).filter(
+            models.Q(original__in=[trade.original, trade.offer]) |
+            models.Q(offer__in=[trade.original, trade.offer])
+        ).exclude(id=trade.id).delete()
 
-    buyer_balance.save()
-    seller_balance.save()
+    return Response(
+        {"detail": "Listing purchased successfully"}, status=status.HTTP_200_OK
+    )
 
-    # Transfer Pokémon ownership
-    pokemon.owner_user = buyer
-    pokemon.save()
-
-    # Close listing
-    listing.status = 'CLOSED'
-    listing.save()
-
-    # Record purchase
-    Purchase.objects.create(buyer=buyer, seller=seller, pokemon=pokemon, price=price)
-
-    return Response({'detail': 'Purchase successful'}, status=status.HTTP_200_OK)
-
-
-
-@api_view(['GET'])
+@api_view(["GET"])
 @permission_classes([IsAuthenticated])
 def get_transactions(request):
     transactions = Transaction.objects.filter(
         models.Q(buyer=request.user) | models.Q(seller=request.user)
-    ).order_by('-created_at')
+    ).order_by("-created_at")
 
-    data = [
-        {
-            'id': tx.id,
-            'buyer': tx.buyer.username,
-            'seller': tx.seller.username,
-            'type': 'trade' if tx.trade else 'purchase',
-            'ref_id': tx.trade.id if tx.trade else tx.purchase.id,
-            'timestamp': tx.created_at
-        }
-        for tx in transactions
-    ]
+    serializer = TransactionSerializer(transactions, many=True)
+    base_data = serializer.data
 
-    return Response(data, status=status.HTTP_200_OK)
+    search = request.GET.get("search", "").lower()
 
+    enriched = []
+
+    for transaction in base_data:
+        type = transaction['type']
+        if type == "trade":
+            offer = transaction['info']["offer"]
+            original = transaction['info']["original"]
+
+            offer_api_data = fetch_pokeapi_data(offer["poke_dex_id"])
+            original_api_data = fetch_pokeapi_data(original["poke_dex_id"])
+
+            if search and (offer_api_data or original_api_data):
+                if (offer_api_data and search not in offer_api_data["name"].lower()) and (original_api_data and search not in original_api_data["name"].lower()):
+                    continue
+
+            offer["api_data"] = offer_api_data or {}
+            original["api_data"] = original_api_data or {}
+            enriched.append(transaction)
+        else:
+            p = transaction["info"]["pokemon"]
+            api_data = fetch_pokeapi_data(p["poke_dex_id"])
+                
+            if search and api_data:
+                if search not in api_data["name"].lower():
+                    continue
+            p["api_data"] = api_data or {}
+            enriched.append(transaction)
+
+    return Response(enriched, status=status.HTTP_200_OK)
+
+
+@api_view(["POST"])
+@permission_classes([IsAuthenticated])
+def create_listing(request):
+    pokemon_id = request.data.get("pokemon")
+    price = request.data.get("price")
+    completed = False
+
+    if not pokemon_id or price is None:
+        return Response(
+            {"detail": "pokemon_id and price are required"},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+
+    pokemon = Pokemon.objects.get(id=pokemon_id)
+
+    listing = Listing.objects.create(pokemon=pokemon, price=price, completed=completed)
+
+    return Response(
+        data={"detail": "listing successfully created"}, status=status.HTTP_200_OK
+    )
+
+
+@api_view(["PUT"])
+@permission_classes([IsAuthenticated])
+def edit_listing(request, listing_id):
+    try:
+        listing = Listing.objects.get(id=listing_id)
+    except Listing.DoesNotExist:
+        return Response(
+            {"detail": "Listing not found"}, status=status.HTTP_404_NOT_FOUND
+        )
+
+    price = request.data.get("price")
+    completed = request.data.get("completed")
+
+    if price is not None:
+        listing.price = price
+
+    if completed is not None:
+        listing.completed = completed
+
+    listing.save()
+
+    return Response(
+        {"detail": "Listing updated successfully"}, status=status.HTTP_200_OK
+    )
+
+
+@api_view(["POST"])
+@permission_classes([IsAuthenticated])
+def delete_listing(request, listing_id):
+    try:
+        listing = Listing.objects.get(id=listing_id)
+    except Listing.DoesNotExist:
+        return Response(
+            {"detail": "Listing not found"}, status=status.HTTP_404_NOT_FOUND
+        )
+
+    listing.delete()
+
+    return Response(
+        {"detail": "Listing deleted successfully"}, status=status.HTTP_200_OK
+    )
+
+
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
+def get_listings(request):
+    user = request.user
+
+    if not user.is_authenticated:
+        return Response(
+            {"detail": "Authentication required"}, status=status.HTTP_401_UNAUTHORIZED
+        )
+
+    listings = Listing.objects.filter(completed=False)
+    serializer = ListingSerializer(listings, many=True)
+
+    base_data = serializer.data
+
+    search = request.GET.get("search", "").lower()
+
+    enriched = []
+    myListings = []
+
+    for listing in base_data:
+        p = listing["pokemon"]
+        api_data = fetch_pokeapi_data(p["poke_dex_id"])
+
+        if p["owner_user"]["id"] == user.id:
+            p["api_data"] = api_data or {}
+            myListings.append(listing)
+            continue
+
+        if search and api_data:
+            if search not in api_data["name"].lower():
+                continue
+        p["api_data"] = api_data or {}
+        enriched.append(listing)
+
+    return Response({"myListings": myListings, "listings": enriched})
+
+
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
+def get_listing(request, listing_id):
+    user = request.user
+
+    if not user.is_authenticated:
+        return Response(
+            {"detail": "Authentication required"}, status=status.HTTP_401_UNAUTHORIZED
+        )
+
+    listings = Listing.objects.filter(completed=False, id=listing_id)
+    serializer = ListingSerializer(listings, many=True)
+
+    base_data = serializer.data[0]
+
+    pokemon = base_data["pokemon"]
+    api_data = fetch_pokeapi_data(pokemon["poke_dex_id"])
+    pokemon["api_data"] = api_data
+
+    return Response(base_data)
+
+
+@api_view(["POST"])
+@permission_classes([IsAuthenticated])
+def purchase_listing(request, listing_id):
+    user = request.user
+
+    if not user.is_authenticated:
+        return Response(
+            {"detail": "Authentication required"}, status=status.HTTP_401_UNAUTHORIZED
+        )
+
+    try:
+        listing = Listing.objects.select_related("pokemon__owner_user").get(
+            pk=listing_id
+        )
+    except Listing.DoesNotExist:
+        return Response(
+            {"detail": "Listing not found"}, status=status.HTTP_404_NOT_FOUND
+        )
+
+    if listing.completed:
+        return Response(
+            {"detail": "Listing already completed"}, status=status.HTTP_400_BAD_REQUEST
+        )
+
+    seller = listing.pokemon.owner_user
+    buyer = user
+    price = listing.price
+
+    if buyer.balance.balance < price:
+        return Response(
+            {"detail": "Insufficient funds"}, status=status.HTTP_400_BAD_REQUEST
+        )
+
+    if buyer == seller:
+        return Response(
+            {"detail": "Cannot buy own pokemon"}, status=status.HTTP_400_BAD_REQUEST
+        )
+
+    with transaction.atomic():
+        newTransaction = Transaction.objects.create(
+            buyer=user,
+            seller=listing.pokemon.owner_user,
+            content_type=ContentType.objects.get_for_model(Listing),
+            object_id=listing_id,
+        )
+
+        # Swap ownership
+        pokemon = listing.pokemon
+        pokemon.owner_user = buyer
+        pokemon.save()
+
+        # Update listing
+        listing.completed = True
+        listing.save()
+
+        # Update balances
+        buyer.balance.balance -= price
+        seller.balance.balance += price
+        buyer.balance.save()
+        seller.balance.save()
+
+        Listing.objects.filter(pokemon=pokemon, completed=False).delete()
+        Trade.objects.filter(completed=False).filter(models.Q(original=pokemon) | models.Q(offer=pokemon)).delete()
+
+    return Response(
+        {"detail": "Listing purchased successfully"}, status=status.HTTP_200_OK
+    )

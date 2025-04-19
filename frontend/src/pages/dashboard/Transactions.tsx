@@ -1,11 +1,37 @@
 import { Link, useSearchParams } from "react-router-dom";
 import SearchBar from "../../components/SearchBar";
 import Transaction from "../../components/cards/Transaction";
+import { useEffect, useState } from "react";
+import { useAuth } from "../../hooks/useAuth";
+
+const BASE_URL = import.meta.env.VITE_BASE_URL;
 
 export default function Transactions() {
   const [searchParams] = useSearchParams();
+  const { token } = useAuth();
+  const [data, setData] = useState(null);
 
   const search = searchParams.get("keyword");
+
+  useEffect(() => {
+    let url = `${BASE_URL}/api/trade/transactions/`;
+    if (search) url += `?search=${search}`;
+
+    async function getData() {
+      const response = await fetch(url, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      const json = await response.json();
+      setData(json);
+    }
+
+    getData();
+  }, [token, search]);
+
+  console.log(data);
 
   return (
     <>
@@ -42,18 +68,22 @@ export default function Transactions() {
               </span>
             </h1>
             <div className="px-10 flex flex-col gap-4">
-              <Transaction />
-              <Transaction />
-              <Transaction />
-              <Transaction />
-              <Transaction />
-              <Transaction />
-              <Transaction />
-              <Transaction />
-              <Transaction />
-              <Transaction />
-              <Transaction />
-              <Transaction />
+              {data ? (
+                data.map((transaction) => {
+                  return (
+                    <Transaction
+                      key={transaction.id}
+                      transaction={transaction}
+                    />
+                  );
+                })
+              ) : (
+                <>
+                  <Transaction />
+                  <Transaction />
+                  <Transaction />
+                </>
+              )}
             </div>
           </div>
         </div>

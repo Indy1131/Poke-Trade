@@ -1,5 +1,7 @@
 from django.shortcuts import render
 from pokemon.models import Pokemon
+from trade.models import Listing
+from trade.serializers import ListingSerializer
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
@@ -15,6 +17,14 @@ def get_pokemon(request, pokemon_id):
         api_data = fetch_pokeapi_data(serializer.data['poke_dex_id'])
         data = dict(serializer.data)
         data['api_data'] = api_data or {}
+
+        try:
+            listing = Listing.objects.get(pokemon=pokemon, completed=False)
+            listing_data = ListingSerializer(listing).data
+            data['listing_price'] = listing_data['price']
+            data['listing_id'] = listing_data['id']
+        except Listing.DoesNotExist:
+            data['listing_price'] = None
 
         return Response(data = data, status = status.HTTP_200_OK)
     except(Pokemon.DoesNotExist):

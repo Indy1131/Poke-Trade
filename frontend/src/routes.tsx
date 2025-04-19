@@ -11,6 +11,8 @@ import Transactions from "./pages/dashboard/Transactions";
 import Pokemon from "./pages/dashboard/Pokemon";
 import ForgotPassword from "./pages/ForgotPassword";
 import Trades from "./pages/dashboard/Trades";
+import PokemonListing from "./pages/dashboard/PokemonListing";
+import CreateTrade from "./pages/dashboard/CreateTrade";
 
 export default [
   {
@@ -77,6 +79,14 @@ export default [
           {
             path: "/dashboard/pokemon/:id",
             element: <Pokemon />,
+          },
+          {
+            path: "/dashboard/market/:id",
+            element: <PokemonListing />,
+          },
+          {
+            path: "/dashboard/create_trade/:id",
+            element: <CreateTrade />,
           },
         ],
       },

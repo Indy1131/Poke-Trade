@@ -2,9 +2,9 @@ type Props = {
   type?: string;
   name: string;
   label: string;
-  className: string;
+  className?: string;
   noLabel?: boolean;
-  value: string;
+  value: string | number;
   onChange: React.ChangeEventHandler<HTMLInputElement>;
   onFocus?: React.FocusEventHandler<HTMLInputElement>;
   error?: string[] | null | undefined | string;
@@ -30,7 +30,7 @@ export default function Input({
       )}
       <input
         type={type ? type : "text"}
-        className="border-2 border-outline box-border rounded-md w-full p-2 border-outline"
+        className="border-2 border-outline box-border rounded-md w-full p-2"
         // style={{ boxShadow: "0 0px 3px 0px #9D033A" }}
         autoComplete="off"
         placeholder={label}

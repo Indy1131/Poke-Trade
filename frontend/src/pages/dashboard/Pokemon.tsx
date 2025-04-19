@@ -1,8 +1,11 @@
 import { useEffect, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { useAuth } from "../../hooks/useAuth";
 import Type from "../../components/Type";
 import { Name } from "../../components/Type";
+import Button from "../../components/form/Button";
+import Input from "../../components/form/Input";
+import Stats from "../../components/Stats";
 
 const BASE_URL = import.meta.env.VITE_BASE_URL;
 
@@ -13,44 +16,83 @@ type Pokemon = {
     stats: { [key: string]: number };
     types: Name[];
   };
+  listing_price: number | null;
+  listing_id: number | null;
   id: number;
   owner_user: number;
   poke_dex_id: number;
 };
 
-const colors = [
-  { value: 50, color: [255, 0, 0] },
-  { value: 80, color: [255, 152, 2] },
-  { value: 100, color: [255, 254, 3] },
-  { value: 150, color: [0, 255, 43] },
-  { value: 200, color: [0, 255, 255] },
-];
+export default function Pokemon({
+  fromMarket,
+  poke_id,
+}: {
+  fromMarket?: boolean;
+  poke_id?: number;
+}) {
+  const { token } = useAuth();
+  const params_id = useParams().id;
+  const [data, setData] = useState<Pokemon | null>(null);
+  const [formData, setFormData] = useState({ price: 0 });
+  const [editingListing, setEditingListing] = useState(false);
+  const navigate = useNavigate();
 
-function getColor(value: number) {
-  value = Math.min(value, 200);
+  const id = poke_id ? poke_id : params_id;
 
-  let floor = 0;
-  while (floor < colors.length - 1 && colors[floor + 1].value < value) {
-    floor++;
+  function handleListingClick() {
+    setEditingListing(true);
   }
 
-  const lower = colors[floor];
-  const upper = colors[floor + 1];
+  function handleCancelClick() {
+    setEditingListing(false);
+  }
 
-  const range = upper.value - lower.value;
-  const rel = (value - lower.value) / range;
+  async function handleDeleteClick() {
+    if (!data || !data.listing_id) return;
 
-  const interpolated = lower.color.map((c, i) =>
-    Math.round(c + (upper.color[i] - c) * rel)
-  );
+    await fetch(`${BASE_URL}/api/trade/listings/${data.listing_id}/delete/`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    navigate(fromMarket ? "/dashboard/market" : "/dashboard");
+  }
 
-  return interpolated;
-}
+  function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  }
 
-export default function Pokemon() {
-  const { token } = useAuth();
-  const { id } = useParams();
-  const [data, setData] = useState<Pokemon | null>(null);
+  async function handleCreateSubmit() {
+    if (formData.price == 0) return;
+
+    await fetch(`${BASE_URL}/api/trade/create_listing/`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        pokemon: id,
+        price: formData.price,
+      }),
+    });
+  }
+
+  async function handleEditSubmit() {
+    if (!data || !data.listing_id || formData.price == 0) return;
+
+    await fetch(`${BASE_URL}/api/trade/listings/${data.listing_id}/edit/`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        price: formData.price,
+      }),
+    });
+  }
 
   useEffect(() => {
     async function getData() {
@@ -62,6 +104,8 @@ export default function Pokemon() {
       });
       const json = await response.json();
       setData(json);
+
+      if (json.listing_price) setFormData({ price: json.listing_price });
     }
 
     getData();
@@ -88,17 +132,17 @@ export default function Pokemon() {
               {name}
             </h1>
             <h1 className="">
-              Go back{" "}
+              Done?{" "}
               <Link
-                to="/dashboard/"
-                className="bg-gradient-to-l from-primary to-secondary bg-clip-text text-transparent"
+                to={fromMarket ? "/dashboard/market" : "/dashboard"}
+                className="bg-gradient-to-l from-primary to-secondary bg-clip-text text-transparent cursor-pointer"
               >
-                home
+                {fromMarket ? "Go to the market" : "Go to my collection"}
               </Link>
             </h1>
             <div className="w-full mt-5">
               {data ? (
-                <div className="flex flex-col lg:flex-row gap-3">
+                <div className="flex flex-col sm:flex-row gap-3">
                   <div>
                     <div className="border-2 border-outline rounded-md flex flex-col items-center relative h-[200px] w-[200px] md:h-[400px] md:w-[400px] overflow-hidden p-2 bg-gradient-to-tr from-outline via-white to-white">
                       <h1 className="absolute top-1 left-1 text-xl text-outline">
@@ -117,37 +161,103 @@ export default function Pokemon() {
                         return <Type key={type} name={type} />;
                       })}
                     </div>
+                    <div className="flex-col gap-[2px] flex-1 flex sm:hidden my-10">
+                      <Stats data={data} />
+                    </div>
+                    <div className="flex flex-col gap-4">
+                      {data.listing_price ? (
+                        <>
+                          {editingListing ? (
+                            <>
+                              <h1>Editing Listing</h1>
+                              <form
+                                className="w-full"
+                                onSubmit={handleEditSubmit}
+                              >
+                                <Input
+                                  type="number"
+                                  name="price"
+                                  label="Price"
+                                  value={formData.price}
+                                  onChange={handleChange}
+                                />
+                                <Button text="Submit" className="w-full mb-4" />
+                                <div className="flex gap-2">
+                                  <Button
+                                    text="Unlist"
+                                    type="button"
+                                    className="flex-1"
+                                    appearance="cancel"
+                                    onClick={handleDeleteClick}
+                                  />
+                                  <Button
+                                    text="Cancel"
+                                    type="button"
+                                    className="flex-1"
+                                    appearance="cancel"
+                                    onClick={handleCancelClick}
+                                  />
+                                </div>
+                              </form>
+                            </>
+                          ) : (
+                            <>
+                              <h1>
+                                Listed for{" "}
+                                <span className="text-xl text-green-400">
+                                  ${data.listing_price}
+                                </span>
+                              </h1>
+                              <Button
+                                text="Edit Listing"
+                                onClick={handleListingClick}
+                              />
+                            </>
+                          )}
+                        </>
+                      ) : (
+                        <>
+                          {editingListing ? (
+                            <>
+                              <h1>Create Listing</h1>
+                              <form
+                                className="w-full"
+                                onSubmit={handleCreateSubmit}
+                              >
+                                <Input
+                                  type="number"
+                                  name="price"
+                                  label="Price"
+                                  value={formData.price}
+                                  onChange={handleChange}
+                                />
+                                <div className="flex gap-2">
+                                  <Button text="List" className="flex-1" />
+                                  <Button
+                                    text="Cancel"
+                                    type="button"
+                                    className="flex-1"
+                                    appearance="cancel"
+                                    onClick={handleCancelClick}
+                                  />
+                                </div>
+                              </form>
+                            </>
+                          ) : (
+                            <>
+                              <h1>This Pokemon is currently not listed.</h1>
+                              <Button
+                                text="Create Listing"
+                                onClick={handleListingClick}
+                              />
+                            </>
+                          )}
+                        </>
+                      )}
+                    </div>
                   </div>
-                  <div className="flex flex-col gap-[2px]">
-                    {Object.keys(data.api_data.stats).map((stat) => {
-                      const value = data.api_data.stats[stat];
-                      const percent = Math.min(
-                        Math.floor((value / 200) * 100),
-                        100
-                      );
-
-                      const color = getColor(value);
-
-                      return (
-                        <div className="flex gap-2" key={stat}>
-                          <div className="w-[100px]">
-                            <h1>{stat}</h1>
-                          </div>
-                          <div className="w-[30px] font-medium">{value}</div>
-                          <div className="w-[300px]">
-                            <div
-                              className="h-full rounded-sm overflow-hidden"
-                              style={{
-                                width: percent + "%",
-                                backgroundColor: `rgb(${color.join(",")})`,
-                              }}
-                            >
-                              <div className="w-full h-full bg-gradient-to-b from-white/40  to-transparent"/>
-                            </div>
-                          </div>
-                        </div>
-                      );
-                    })}
+                  <div className="w-full hidden sm:block">
+                    <Stats data={data} />
                   </div>
                 </div>
               ) : (

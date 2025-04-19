@@ -1,54 +1,25 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.contrib.contenttypes.fields import GenericForeignKey
+from django.contrib.contenttypes.models import ContentType
 from pokemon.models import Pokemon
 
-
 class Trade(models.Model):
-    TRADE_STATUS = [
-        ('pending', 'Pending'),
-        ('approved', 'Approved'),
-        ('rejected', 'Rejected'),
-    ]
+    owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='original_owner')
+    offerer = models.ForeignKey(User, on_delete=models.CASCADE, related_name='offer_owner')
+    original = models.ForeignKey(Pokemon, on_delete=models.CASCADE, related_name='original')
+    offer = models.ForeignKey(Pokemon, on_delete=models.CASCADE, related_name='offer')
+    completed = models.BooleanField(default=False)
 
-
-    id = models.AutoField(primary_key=True)
-    requester = models.ForeignKey(User, on_delete=models.CASCADE,
-                                  related_name='trade_requests'
-                                  )  # who is initiating the request
-    recipient = models.ForeignKey(User, on_delete=models.CASCADE,
-                                  related_name='received_trades')  # who owns the Pokemon
-
-    pokemon_offered = models.ForeignKey(
-        Pokemon,
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True,
-        related_name='offered_in_trades'
-    )  # for trade
-
-    pokemon_requested = models.ForeignKey(
-        Pokemon,
-        on_delete=models.CASCADE,
-        related_name='requested_in_trades',
-        null=False,
-
-    )  # target Pokemon
-
-    status = models.CharField(max_length=10, choices=TRADE_STATUS, default='pending')
-
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-
-class Purchase(models.Model):
-    buyer = models.ForeignKey(User, on_delete=models.CASCADE, related_name='purchases')
+class Listing(models.Model):
     pokemon = models.ForeignKey(Pokemon, on_delete=models.CASCADE)
-    seller = models.ForeignKey(User, on_delete=models.CASCADE, related_name='sales')
     price = models.PositiveIntegerField()
-    created_at = models.DateTimeField(auto_now_add=True)
+    completed = models.BooleanField(default=False)
 
 class Transaction(models.Model):
     buyer = models.ForeignKey(User, on_delete=models.CASCADE, related_name='transaction_buyer')
     seller = models.ForeignKey(User, on_delete=models.CASCADE, related_name='transaction_seller')
-    trade = models.ForeignKey(Trade, on_delete=models.CASCADE, null=True, blank=True)
-    purchase = models.ForeignKey(Purchase, on_delete=models.CASCADE, null=True, blank=True)
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
+    object_id = models.PositiveIntegerField()
+    info = GenericForeignKey('content_type', 'object_id')
     created_at = models.DateTimeField(auto_now_add=True)

@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from django.contrib.auth.models import User
-from .models import Balance, Bids, Asks, Listing, ListingContent
+from .models import Balance, Bids, Asks, ListingContent
 from pokemon.serializers import PokemonSerializer
 from user.serializers import UserSerializer
 
@@ -26,11 +26,11 @@ class ListingContentSerializer(serializers.ModelSerializer):
         model = ListingContent
         fields = ['id', 'pokemon', 'currency']
 
-class ListingSerializer(serializers.ModelSerializer):
-    offer = ListingContentSerializer()
-    ask = ListingContentSerializer()
-    owner = UserSerializer()
+# class ListingSerializer(serializers.ModelSerializer):
+#     offer = ListingContentSerializer()
+#     ask = ListingContentSerializer()
+#     owner = UserSerializer()
 
-    class Meta:
-        model = Listing
-        fields = '__all__'
+#     class Meta:
+#         model = Listing
+#         fields = '__all__'

@@ -22,7 +22,7 @@ export default function Dashboard() {
 
   useEffect(() => {
     let url = `${BASE_URL}/api/pokemon/user_pokemon/`;
-    if (search) url += `?keyword=${search}`;
+    if (search) url += `?search=${search}`;
 
     async function getData() {
       const response = await fetch(url, {
