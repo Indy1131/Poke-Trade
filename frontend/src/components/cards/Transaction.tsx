@@ -21,7 +21,13 @@ export default function Transaction({ transaction }) {
       {transaction.type == "listing" ? (
         <div className="flex gap-2">
           <div className="border-2 border-outline rounded-md flex flex-col items-center relative h-[200px] w-[200px] overflow-hidden p-2 bg-gradient-to-tr from-outline via-white to-white">
-            <h1 className="absolute top-1 left-1 text-xl text-outline">
+            <h1
+              className={`absolute top-1 left-1 text-xl ${
+                transaction.seller.id == user.id
+                  ? "text-secondary"
+                  : "text-green-400"
+              }`}
+            >
               {transaction.info.pokemon.api_data.name}
             </h1>
             <div className="flex-1 w-full relative">
