@@ -6,7 +6,7 @@ export default function Transaction({ transaction }) {
   if (!transaction || !user)
     return (
       <div
-        className="w-full max-w-[1200px] rounded-md border-2 border-outline bg-gradient-to-tr from-outline via-white to-white text-outline h-[150px]"
+        className="w-full max-w-[800px] rounded-md border-2 border-outline bg-gradient-to-tr from-outline via-white to-white text-outline h-[150px]"
         style={{ boxShadow: "0 0px 6px 0px #ECB5BC" }}
       >
         <h1 className="px-3 py-3 text-lg">Loading</h1>
@@ -15,7 +15,7 @@ export default function Transaction({ transaction }) {
 
   return (
     <div
-      className="w-full max-w-[1200px] rounded-md border-2 border-outline bg-gradient-to-tr from-outline via-white to-white text-outline p-2"
+      className="w-full max-w-[800px] rounded-md border-2 border-outline bg-gradient-to-tr from-outline via-white to-white text-outline p-2"
       style={{ boxShadow: "0 0px 6px 0px #ECB5BC" }}
     >
       {transaction.type == "listing" ? (
