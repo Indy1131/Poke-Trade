@@ -30,8 +30,8 @@ export default function Trades() {
   return (
     <>
       <div className="fixed bg-gradient-to-b from-secondary to-primary w-full pointer-events-none h-[calc(100%-8rem)] z-[-1]">
-        <div className="absolute bg-gradient-to-b from-white to-transparent w-full h-[200px] top-0 z-0" />
-        <div className="absolute bg-gradient-to-t from-white to-transparent w-full h-[200px] bottom-0 z-0" />
+        <div className="absolute bg-gradient-to-b from-white to-transparent w-full h-[200px] top-0 z-0 pointer-events-none" />
+        <div className="absolute bg-gradient-to-t from-white to-transparent w-full h-[200px] bottom-0 z-0 pointer-events-none" />
       </div>
       <div className=" w-full flex justify-center flex-1 relative">
         <div className="w-[calc(100%-60px)] mt-10 bg-white rounded-t-3xl z-2 pt-10 flex flex-col items-center">
@@ -61,8 +61,8 @@ export default function Trades() {
                   </h1>
                 ) : (
                   <>
-                    <div className="absolute h-full w-[10px] bg-gradient-to-r from-white to-transparent z-3" />
-                    <div className="absolute right-10 h-full w-[200px] bg-gradient-to-l from-white to-transparent z-3" />
+                    <div className="absolute h-full w-[10px] bg-gradient-to-r from-white to-transparent z-3 pointer-events-none" />
+                    <div className="absolute right-10 h-full w-[200px] bg-gradient-to-l from-white to-transparent z-3 pointer-events-none" />
                     <div className="w-full overflow-x-scroll overflow-y-hidden relative h-[320px] pb-12 pt-4 box-content">
                       <div className="flex items-center w-max pl-[10px] pr-[200px] h-full gap-5">
                         {outbound.map((trade) => {

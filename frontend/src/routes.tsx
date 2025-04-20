@@ -13,6 +13,7 @@ import ForgotPassword from "./pages/ForgotPassword";
 import Trades from "./pages/dashboard/Trades";
 import PokemonListing from "./pages/dashboard/PokemonListing";
 import CreateTrade from "./pages/dashboard/CreateTrade";
+import PasswordReset from "./pages/PasswordReset";
 
 export default [
   {
@@ -45,6 +46,14 @@ export default [
         element: (
           <GuestRoute>
             <Signup />
+          </GuestRoute>
+        ),
+      },
+      {
+        path: "/password-reset",
+        element: (
+          <GuestRoute>
+            <PasswordReset />
           </GuestRoute>
         ),
       },

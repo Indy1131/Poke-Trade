@@ -25,12 +25,12 @@ export default function Nav() {
         <div className="w-full h-full flex items-center px-3 gap-8 bg-white text-xs sm:text-sm">
           {path.startsWith("/dashboard") ? (
             <>
-              <Link to="/dashboard">Poke Trade</Link>
-              <Link to="/dashboard/market" className="ml-auto">
+              <Link to="/dashboard" className="hidden sm:block">Poke Trade</Link>
+              <Link to="/dashboard/market" className="ml-auto hidden sm:block">
                 Market
               </Link>
-              <Link to="/dashboard/trades">Trades</Link>
-              <Link to="/dashboard/transactions">Transactions</Link>
+              <Link to="/dashboard/trades" className="hidden sm:block">Trades</Link>
+              <Link to="/dashboard/transactions" className="hidden sm:block">Transactions</Link>
               {user && (
                 <div className="flex items-center gap-2 w-[200px] py-2 px-2 select-none">
                   <h1 className=" bg-gradient-to-tr from-primary via-secondary to-secondary rounded-full text-center w-[2.5rem] h-[2.5rem] pt-[2px] flex items-center justify-center text-xl text-white">
