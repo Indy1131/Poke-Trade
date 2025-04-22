@@ -30,7 +30,7 @@ SECRET_KEY = 'django-insecure-yqpw==8p)r7_s!3k^_j%#=qq&_d=j%%i4k1$+p6#ygo&gt#auv
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['poke-trade-backend.onrender.com']
 
 
 # Application definition
