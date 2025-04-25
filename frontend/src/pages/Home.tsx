@@ -60,8 +60,7 @@ export default function Home() {
                 your Pokemon.
               </h1>
               <p>
-                We have over 1000 of your favorite Pokemon. Build your
-                collection by catching them all!
+                Have a Pokemon you really want? Trade with your friends to add it to your collection!
               </p>
             </Card>
             <Card className="flex-1">
@@ -72,8 +71,7 @@ export default function Home() {
                 your Pokemon.
               </h1>
               <p>
-                We have over 1000 of your favorite Pokemon. Build your
-                collection by catching them all!
+                Sell you Pokemon for Poke Dollars. Use Poke Dollars to purchase your favorite Pokemon!
               </p>
             </Card>
             <Card className="flex-1">
@@ -84,8 +82,7 @@ export default function Home() {
                 with fans.
               </h1>
               <p>
-                We have over 1000 of your favorite Pokemon. Build your
-                collection by catching them all!
+                Socializie with Pokemon fans on one massive platform! Interact with other users through our market by trading and selling!
               </p>
             </Card>
           </div>
