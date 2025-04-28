@@ -62,7 +62,7 @@ export default function Trades() {
                 ) : (
                   <>
                     <div className="absolute h-full w-[10px] bg-gradient-to-r from-white to-transparent z-3 pointer-events-none" />
-                    <div className="absolute right-10 h-full w-[200px] bg-gradient-to-l from-white to-transparent z-3 pointer-events-none" />
+                    <div className="absolute right-10 h-full w-[200px] bg-gradient-to-l from-white to-transparent z-3 pointer-events-none hidden sm:block" />
                     <div className="w-full overflow-x-scroll overflow-y-hidden relative h-[320px] pb-12 pt-4 box-content">
                       <div className="flex items-center w-max pl-[10px] pr-[200px] h-full gap-5">
                         {outbound.map((trade) => {
@@ -86,7 +86,7 @@ export default function Trades() {
                 ) : (
                   <>
                     <div className="absolute h-full w-[10px] bg-gradient-to-r from-white to-transparent z-3" />
-                    <div className="absolute right-10 h-full w-[200px] bg-gradient-to-l from-white to-transparent z-3" />
+                    <div className="absolute right-10 h-full w-[200px] bg-gradient-to-l from-white to-transparent z-3 sm:block hidden" />
                     <div className="w-full overflow-x-scroll overflow-y-hidden relative h-[320px] pb-12 pt-4 box-content">
                       <div className="flex items-center w-max pl-[10px] pr-[200px] h-full gap-5">
                         {inbound.map((trade) => {

@@ -107,7 +107,7 @@ export default function CreateTrade() {
                   ? `${listingData.pokemon.owner_user.username}'s ${listingData.pokemon.api_data.name}`
                   : "Loading"}
               </h1>
-              <div className="flex gap-6">
+              <div className="flex gap-6 flex-col sm:flex-row">
                 <div>
                   <div className="border-2 border-outline rounded-md flex flex-col items-center relative h-[200px] w-[200px] overflow-hidden p-2 bg-gradient-to-tr from-outline via-white to-white">
                     <h1 className="absolute top-1 left-1 text-xl text-outline">
@@ -144,7 +144,7 @@ export default function CreateTrade() {
               <h1 className="text-xl mb-3">
                 {data && data.length > 0 ? "Your offer" : "Invalid Offer"}
               </h1>
-              <div className="flex gap-6">
+              <div className="flex gap-6 flex-col sm:flex-row">
                 <div>
                   <div className="border-2 border-outline rounded-md flex flex-col items-center relative h-[200px] w-[200px] overflow-hidden p-2 bg-gradient-to-tr from-outline via-white to-white">
                     <h1 className="absolute top-1 left-1 text-xl text-outline">

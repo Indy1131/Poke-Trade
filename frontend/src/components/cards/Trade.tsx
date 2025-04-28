@@ -33,7 +33,7 @@ export default function Trade({ trade, inbound }) {
       <h1>
         {!inbound && trade ? `${trade.original.owner_user.username}'s` : "Your"}
       </h1>
-      <div className="border-2 border-outline rounded-md flex flex-col items-center relative h-[200px] w-[200px] overflow-hidden p-2 bg-gradient-to-tr from-outline via-white to-white">
+      <div className="border-2 border-outline rounded-md flex flex-col items-center relative h-[120px] w-[120px] sm:h-[200px] sm:w-[200px] overflow-hidden p-2 bg-gradient-to-tr from-outline via-white to-white">
         <h1 className="absolute top-1 left-1 text-xl text-outline">
           {trade ? trade.original.api_data.name : "Loading"}
         </h1>
@@ -55,7 +55,7 @@ export default function Trade({ trade, inbound }) {
       <h1>
         {inbound && trade ? `${trade.offer.owner_user.username}'s` : "Your"}
       </h1>
-      <div className="border-2 border-outline rounded-md flex flex-col items-center relative h-[200px] w-[200px] overflow-hidden p-2 bg-gradient-to-tr from-outline via-white to-white">
+      <div className="border-2 border-outline rounded-md flex flex-col items-center relative h-[120px] w-[120px] sm:h-[200px] sm:w-[200px] overflow-hidden p-2 bg-gradient-to-tr from-outline via-white to-white">
         <h1 className="absolute top-1 left-1 text-xl text-outline">
           {trade ? trade.offer.api_data.name : "Loading"}
         </h1>
@@ -74,12 +74,12 @@ export default function Trade({ trade, inbound }) {
 
   return (
     <div
-      className="w-full max-w-[600px] rounded-md p-2 border-2 border-outline bg-gradient-to-tr from-outline via-white to-white"
+      className="w-full sm:max-w-[600px] rounded-md p-2 border-2 border-outline bg-gradient-to-tr from-outline via-white to-white"
       style={{ boxShadow: "0 0px 6px 0px #ECB5BC" }}
     >
       <div className="flex justify-between items-stretch">
         {offer}
-        <div className="flex items-center text-3xl mx-6">
+        <div className="flex items-center sm:text-3xl mx-6">
           <h1>For</h1>
         </div>
         {original}
